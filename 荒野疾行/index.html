@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#18251e">
+  <title>荒野疾行 | 恐龙跑酷</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=ZCOOL+XiaoWei&display=swap');
+
+    :root {
+      color-scheme: dark;
+      --ink: #18251e;
+      --ink-soft: #25342b;
+      --paper: #f0eddf;
+      --paper-dim: #cfcebd;
+      --lime: #d7f36a;
+      --coral: #ff7862;
+      --sky: #a9ddd1;
+      --line: rgba(240, 237, 223, .18);
+      --mono: "DM Mono", "Courier New", monospace;
+      --display: "ZCOOL XiaoWei", "STSong", serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--paper);
+      background-color: var(--ink);
+      background-image: radial-gradient(rgba(240, 237, 223, .1) .7px, transparent .7px);
+      background-size: 7px 7px;
+      font-family: var(--mono);
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin: auto; padding: 26px 0 42px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--paper); text-decoration: none; font-size: 12px; letter-spacing: 0; }
+    .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; color: var(--ink); background: var(--lime); font-size: 18px; transform: rotate(-5deg); }
+    .top-meta { color: var(--paper-dim); font-size: 11px; }
+    .view { display: none; animation: enter .32s ease-out both; }
+    .view.active { display: block; }
+    @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .home-grid { min-height: 570px; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(300px, .88fr); align-items: center; gap: 60px; padding: 55px 0 25px; }
+    .eyebrow { color: var(--lime); font-size: 11px; letter-spacing: 0; text-transform: uppercase; }
+    h1 { margin: 16px 0 8px; font-family: var(--display); font-size: clamp(54px, 8vw, 94px); font-weight: 400; line-height: 1; letter-spacing: 0; }
+    .subtitle { margin: 18px 0 30px; color: var(--paper-dim); font-family: var(--display); font-size: 20px; }
+    .profile { display: flex; align-items: center; gap: 10px; margin: 27px 0 24px; color: var(--paper-dim); font-size: 11px; }
+    .profile input { width: 165px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 0; outline: 0; background: rgba(240,237,223,.05); color: var(--paper); }
+    .profile input:focus { border-color: var(--lime); }
+    .menu-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .mode-panel { margin-top: 14px; padding: 16px 18px; border: 1px solid var(--line); background: rgba(240,237,223,.04); animation: enter .24s ease-out both; }
+    .mode-panel-note { margin: 0 0 14px; color: var(--paper-dim); font-family: var(--display); font-size: 15px; line-height: 1.6; }
+    .mode-panel-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .button { min-height: 43px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; transition: background .16s, color .16s, border-color .16s, transform .16s; }
+    .button:hover { border-color: var(--lime); transform: translateY(-2px); }
+    .button.primary { border-color: var(--lime); background: var(--lime); color: var(--ink); font-weight: 500; }
+    .button.primary:hover { background: #e4ff8a; }
+    .button.coral { border-color: var(--coral); color: var(--coral); }
+    .button:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .home-art { position: relative; min-height: 350px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); background: #294239; }
+    .home-art::before { content: ""; position: absolute; width: 270px; height: 270px; top: 28px; right: 32px; border-radius: 50%; background: var(--coral); }
+    .home-art::after { content: ""; position: absolute; width: 110%; height: 72px; bottom: 0; left: -5%; border-top: 2px solid var(--lime); background: repeating-linear-gradient(90deg, transparent 0 25px, rgba(215,243,106,.22) 26px 28px), #18251e; }
+    .art-label { position: absolute; top: 18px; left: 18px; z-index: 1; color: var(--paper-dim); font-size: 10px; }
+    .art-dino { position: relative; z-index: 1; width: 230px; height: 190px; margin: 30px 45px 0 0; filter: drop-shadow(8px 10px 0 rgba(24,37,30,.4)); animation: bob 2.4s ease-in-out infinite; }
+    .art-dino svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    @keyframes bob { 50% { transform: translateY(-9px) rotate(-2deg); } }
+    .art-stamp { position: absolute; right: 20px; bottom: 91px; z-index: 2; color: var(--lime); font-size: 10px; transform: rotate(-7deg); }
+    .home-stats { display: flex; gap: 28px; margin-top: 34px; }
+    .stat { display: grid; gap: 5px; }
+    .stat span:first-child { color: var(--paper-dim); font-size: 10px; }
+    .stat strong { color: var(--lime); font-size: 19px; font-weight: 500; }
+    .page-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 42px 0 25px; border-bottom: 1px solid var(--line); }
+    .page-head h2 { margin: 8px 0 0; font-family: var(--display); font-size: 42px; font-weight: 400; }
+    .back-button { min-width: 43px; padding: 0 13px; }
+    .table-head, .leader-row { display: grid; grid-template-columns: 72px 1fr 160px; align-items: center; gap: 18px; padding: 15px 20px; }
+    .table-head { margin-top: 20px; color: var(--paper-dim); font-size: 10px; }
+    .leader-row { border-top: 1px solid var(--line); font-size: 13px; }
+    .leader-row:first-child { border-top: 0; }
+    .leader-rank { color: var(--lime); }
+    .leader-score { text-align: right; }
+    .empty-state { padding: 35px 20px; border-top: 1px solid var(--line); color: var(--paper-dim); font-family: var(--display); font-size: 18px; }
+    .shop-wallet { color: var(--lime); font-size: 12px; }
+    .shop-list { padding: 10px 0; }
+    .shop-item { display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 22px; padding: 23px 4px; border-bottom: 1px solid var(--line); }
+    .item-icon { width: 58px; height: 58px; display: grid; place-items: center; background: var(--ink-soft); color: var(--lime); font-size: 26px; }
+    .item-copy h3 { margin: 0 0 7px; color: var(--paper); font-family: var(--display); font-size: 22px; font-weight: 400; }
+    .item-copy p { margin: 4px 0; color: var(--paper-dim); font-size: 11px; line-height: 1.7; }
+    .item-level { color: var(--lime) !important; }
+    .item-buy { min-width: 138px; text-align: center; }
+    .shop-footnote { margin: 18px 0; color: var(--paper-dim); font-size: 10px; line-height: 1.8; }
+    .game-view { padding-top: 25px; }
+    .game-hud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border: 1px solid var(--line); background: var(--line); }
+    .hud-cell { min-width: 0; padding: 12px 15px; background: var(--ink); }
+    .hud-cell small { display: block; margin-bottom: 5px; color: var(--paper-dim); font-size: 9px; }
+    .hud-cell strong { color: var(--lime); font-size: 17px; font-weight: 500; }
+    .hud-cell strong span { color: var(--paper-dim); font-size: 10px; }
+    .canvas-wrap { position: relative; margin-top: 12px; border: 1px solid var(--line); background: #b6dfcf; }
+    #game-canvas { display: block; width: 100%; height: auto; aspect-ratio: 960 / 440; }
+    .game-message { position: absolute; inset: 0; display: none; place-items: center; background: rgba(24,37,30,.78); text-align: center; }
+    .game-message.show { display: grid; }
+    .result-box { width: min(420px, calc(100% - 36px)); padding: 28px 20px; border: 1px solid var(--lime); background: var(--ink); animation: enter .28s ease-out both; }
+    .result-box .eyebrow { font-size: 10px; }
+    .result-box h2 { margin: 9px 0; font-family: var(--display); font-size: 39px; font-weight: 400; }
+    .result-score { color: var(--lime); font-size: 27px; }
+    .result-best { margin: 10px 0 21px; color: var(--paper-dim); font-size: 11px; }
+    .result-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+    .controls { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 13px 0; color: var(--paper-dim); font-size: 10px; }
+    .key-hint { display: flex; flex-wrap: wrap; gap: 14px; }
+    kbd { padding: 3px 6px; border: 1px solid var(--line); color: var(--paper); font-family: var(--mono); }
+    .touch-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+    .touch-controls button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-width: 72px; min-height: 60px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--ink-soft); color: var(--lime); cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; transition: background .15s, border-color .15s, transform .1s; }
+    .touch-controls button:active { background: rgba(215,243,106,.18); border-color: var(--lime); transform: scale(.96); }
+    .touch-controls button .tc-icon { font-size: 20px; line-height: 1; }
+    .touch-controls button .tc-label { font-size: 11px; color: var(--paper); }
+    .touch-controls button.tc-accent { border-color: var(--coral); color: var(--coral); }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 9; max-width: min(360px, calc(100vw - 40px)); padding: 12px 16px; border-left: 3px solid var(--lime); background: var(--paper); color: var(--ink); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .footer { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); color: rgba(240,237,223,.46); font-size: 9px; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 580px); padding-top: 15px; }
+      .home-grid { grid-template-columns: 1fr; gap: 24px; padding-top: 42px; }
+      .home-art { min-height: 240px; }
+      .home-art::before { width: 185px; height: 185px; }
+      .art-dino { width: 180px; height: 150px; }
+      .home-stats { margin-top: 26px; }
+      .game-hud { grid-template-columns: repeat(2, 1fr); }
+      .hud-cell { padding: 9px 11px; }
+      .controls { align-items: flex-start; flex-direction: column; }
+      .key-hint { gap: 8px; }
+      .touch-controls { gap: 8px; }
+      .touch-controls button { flex: 1 1 22%; min-width: 60px; min-height: 56px; }
+      .shop-item { grid-template-columns: 48px 1fr; gap: 13px; }
+      .item-icon { width: 46px; height: 46px; }
+      .item-buy { grid-column: 2; justify-self: start; }
+      .page-head h2 { font-size: 34px; }
+    }
+    @media (max-width: 430px) {
+      .profile { flex-wrap: wrap; }
+      .menu-actions .button { flex: 1 1 42%; padding: 0 9px; font-size: 11px; }
+      .table-head, .leader-row { grid-template-columns: 48px 1fr 92px; gap: 8px; padding-right: 10px; padding-left: 10px; }
+      .top-meta { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="荒野疾行主页"><span class="brand-mark">R</span><span>ROUGH RUN / 荒野疾行</span></a>
+      <span class="top-meta">NO. 001 &nbsp;·&nbsp; DESERT CIRCUIT</span>
+    </header>
+
+    <section class="view active" id="home-view">
+      <div class="home-grid">
+        <div>
+          <div class="eyebrow">A small dinosaur, a very long road</div>
+          <h1>荒野<br>疾行</h1>
+          <p class="subtitle">风会变快，别停下来。</p>
+          <label class="profile" for="player-name">跑者代号 <input id="player-name" maxlength="14" value="跑者" autocomplete="nickname"></label>
+          <div class="menu-actions">
+            <button class="button primary" id="classic-button">▶ 经典模式</button>
+            <button class="button" id="challenge-button">⚔ 挑战模式</button>
+            <button class="button" id="leaderboard-button">▤ 排行榜</button>
+            <button class="button" id="shop-button">◇ 道具商城</button>
+          </div>
+          <div class="mode-panel" id="classic-panel" hidden>
+            <p class="mode-panel-note">经典模式 · 无尽跑酷，躲避障碍、收集金币、刷新纪录。</p>
+            <div class="mode-panel-actions">
+              <button class="button primary" id="start-button">▶ 开始游戏</button>
+              <button class="button" id="classic-cancel">← 返回</button>
+            </div>
+          </div>
+          <div class="home-stats">
+            <div class="stat"><span>随身金币</span><strong id="home-coins">0</strong></div>
+            <div class="stat"><span>个人纪录</span><strong id="home-best">0 m</strong></div>
+            <div class="stat"><span>最高速度</span><strong>100 m/s</strong></div>
+          </div>
+        </div>
+        <div class="home-art" aria-label="奔跑中的恐龙插画">
+          <span class="art-label">FIELD NOTES / 01</span>
+          <span class="art-dino" aria-hidden="true"><svg viewBox="0 0 240 180">
+            <path d="M66 91C49 76 31 73 14 80l17 16-18 10 41 11 22-18Z" fill="#253b30"/>
+            <path d="M64 87c8-26 39-39 69-32 25 6 39 24 38 49-1 22-20 35-49 35H81c-20-8-27-29-17-52Z" fill="#315e49"/>
+            <path d="M67 76 77 57l11 12 12-21 11 15 13-16 8 20" fill="#d7f36a" stroke="#253b30" stroke-linejoin="round" stroke-width="5"/>
+            <path d="M128 72V48c0-16 13-24 34-22l25 4c11 2 17 10 17 21v15l-19 8-8 15-30-2Z" fill="#315e49"/>
+            <path d="M177 57h35c10 0 15 6 15 14s-6 13-17 13h-30Z" fill="#315e49"/>
+            <path d="M86 102c15-7 32-6 48 2l2 31H94c-8-8-11-20-8-33Z" fill="#a9ddd1"/>
+            <path d="M83 135h21v24H92l-8-8-8 8H65v-7l13-4Z" fill="#253b30"/>
+            <path d="M124 134h21v25h-13l-7-8-8 8h-12v-7l14-4Z" fill="#253b30"/>
+            <path d="M136 96c9-7 17-7 23-2" fill="none" stroke="#253b30" stroke-linecap="round" stroke-width="6"/>
+            <circle cx="187" cy="47" r="8" fill="#f0eddf"/><circle cx="189" cy="48" r="4" fill="#18251e"/>
+            <circle cx="219" cy="69" r="3" fill="#d7f36a"/>
+          </svg></span>
+          <span class="art-stamp">RUN FAST<br>STAY WILD</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="leaderboard-view">
+      <div class="page-head"><div><div class="eyebrow">LOCAL RECORDS</div><h2>跑者榜</h2></div><button class="button back-button" data-home aria-label="返回主界面" title="返回主界面">←</button></div>
+      <div class="table-head"><span>名次</span><span>跑者</span><span class="leader-score">最佳距离</span></div>
+      <div id="leaderboard-list"></div>
+    </section>
+
+    <section class="view" id="shop-view">
+      <div class="page-head"><div><div class="eyebrow">FIELD EQUIPMENT</div><h2>道具商城</h2></div><div style="display:flex;align-items:center;gap:14px"><span class="shop-wallet">◈ <span id="shop-coins">0</span></span><button class="button back-button" data-home aria-label="返回主界面" title="返回主界面">←</button></div></div>
+      <div class="shop-list" id="shop-list"></div>
+      <p class="shop-footnote">道具按键：飞行器 <kbd>F</kbd> &nbsp; 双倍金币 <kbd>G</kbd><br>冷却时间从使用时开始计算；升级费用每次递增 50 金币。</p>
+    </section>
+
+    <section class="view game-view" id="game-view">
+      <div class="game-hud">
+        <div class="hud-cell"><small>距离 / SCORE</small><strong id="hud-score">0 <span>m</span></strong></div>
+        <div class="hud-cell"><small>速度 / SPEED</small><strong id="hud-speed">8 <span>m/s</span></strong></div>
+        <div class="hud-cell"><small>本局金币 / RUN COINS</small><strong id="hud-coins">0</strong></div>
+        <div class="hud-cell"><small>随身金币 / WALLET</small><strong id="hud-wallet">0</strong></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="game-canvas" width="960" height="440" aria-label="恐龙跑酷游戏场景"></canvas>
+        <div class="game-message" id="game-message"><div class="result-box"><div class="eyebrow">RUN COMPLETE</div><h2>这一程，跑得漂亮。</h2><div class="result-score" id="result-score">0 m</div><div class="result-best" id="result-best">历史最高：0 m</div><div class="result-actions"><button class="button primary" id="continue-button">↻ 继续游戏</button><button class="button" id="result-home-button">⌂ 回到主界面</button></div></div></div>
+      </div>
+      <div class="controls"><div class="key-hint"><span><kbd>Space</kbd>/<kbd>↑</kbd> 跳跃</span><span><kbd>↓</kbd> 下蹲</span><span><kbd>F</kbd> 飞行</span><span><kbd>G</kbd> 双倍金币</span></div><div class="touch-controls"><button id="touch-jump" aria-label="跳跃"><span class="tc-icon">⬆</span><span class="tc-label">跳跃</span></button><button id="touch-duck" aria-label="下蹲"><span class="tc-icon">⬇</span><span class="tc-label">下蹲</span></button><button id="touch-flight" aria-label="飞行"><span class="tc-icon">✦</span><span class="tc-label">飞行</span></button><button id="touch-double" aria-label="双倍金币" class="tc-accent"><span class="tc-icon">×2</span><span class="tc-label">双倍金币</span></button></div></div>
+    </section>
+    <footer class="footer">A LITTLE RUN THROUGH THE BIG WILD &nbsp;·&nbsp; 进度保存在当前浏览器</footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "rough-run-save-v1";
+      const MAX_LEVEL = 99;
+      const MAX_SPEED = 100;
+      const PIXELS_PER_METER = 3.2;
+      const canvas = document.getElementById("game-canvas");
+      const context = canvas.getContext("2d");
+      const views = [...document.querySelectorAll(".view")];
+      const nameInput = document.getElementById("player-name");
+
+      const freshSave = () => ({ coins: 0, items: { flight: 0, double: 0 }, bests: {} });
+      let save = loadSave();
+      let playerName = "跑者";
+      let game = null;
+      let lastFrame = 0;
+      let animationFrame = 0;
+      let toastTimer = 0;
+
+      function loadSave() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          if (!parsed || typeof parsed !== "object") return freshSave();
+          return {
+            coins: Number.isFinite(parsed.coins) ? Math.max(0, parsed.coins) : 0,
+            items: { flight: Math.max(0, Math.min(MAX_LEVEL, Number(parsed.items?.flight) || 0)), double: Math.max(0, Math.min(MAX_LEVEL, Number(parsed.items?.double) || 0)) },
+            bests: parsed.bests && typeof parsed.bests === "object" ? parsed.bests : {}
+          };
+        } catch { return freshSave(); }
+      }
+
+      function persist() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(save)); }
+        catch { showToast("浏览器未允许本地存储，本次进度仅在当前页面保留。"); }
+        updateHomeStats();
+      }
+
+      function cleanName(value) { return value.trim().replace(/[<>]/g, "").slice(0, 14) || "跑者"; }
+      function currentName() { playerName = cleanName(nameInput.value); nameInput.value = playerName; return playerName; }
+      function showView(id) {
+        views.forEach(view => view.classList.toggle("active", view.id === id));
+        if (id === "leaderboard-view") renderLeaderboard();
+        if (id === "shop-view") renderShop();
+        if (id === "home-view") updateHomeStats();
+      }
+      function updateHomeStats() {
+        document.getElementById("home-coins").textContent = save.coins;
+        document.getElementById("shop-coins").textContent = save.coins;
+        document.getElementById("home-best").textContent = `${Math.floor(save.bests[playerName] || 0)} m`;
+      }
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function renderLeaderboard() {
+        const list = document.getElementById("leaderboard-list");
+        const entries = Object.entries(save.bests).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh-CN"));
+        list.replaceChildren();
+        if (!entries.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "还没有跑者留下纪录。第一名的位置，等你来写。";
+          list.append(empty);
+          return;
+        }
+        entries.forEach(([name, score], index) => {
+          const row = document.createElement("div");
+          row.className = "leader-row";
+          const rank = document.createElement("span");
+          rank.className = "leader-rank";
+          rank.textContent = String(index + 1).padStart(2, "0");
+          const runner = document.createElement("span");
+          runner.textContent = name;
+          const distance = document.createElement("span");
+          distance.className = "leader-score";
+          distance.textContent = `${Math.floor(score)} m`;
+          row.append(rank, runner, distance);
+          list.append(row);
+        });
+      }
+
+      const itemInfo = {
+        flight: { name: "飞行器", icon: "✦", description: "升空穿越障碍，速度锁定 100 m/s。基础飞行 500 m；每级增加 0.5 m。落地前会等待前方 5 m 安全。", baseCost: 25 },
+        double: { name: "双倍金币", icon: "×2", description: "限时获得双倍金币。基础持续 5 秒；每级增加 0.5 秒。", baseCost: 25 }
+      };
+      function upgradeCost(level) { return level === 0 ? 25 : 50 * level; }
+      function cooldown(level) { return Math.max(80, 120 - Math.max(0, level - 1) * 5); }
+      function renderShop() {
+        document.getElementById("shop-coins").textContent = save.coins;
+        const list = document.getElementById("shop-list");
+        list.replaceChildren();
+        for (const key of ["flight", "double"]) {
+          const item = itemInfo[key];
+          const level = save.items[key];
+          const maxed = level >= MAX_LEVEL;
+          const row = document.createElement("article");
+          row.className = "shop-item";
+          const icon = document.createElement("div");
+          icon.className = "item-icon";
+          icon.textContent = item.icon;
+          const copy = document.createElement("div");
+          copy.className = "item-copy";
+          const title = document.createElement("h3");
+          title.textContent = item.name;
+          const description = document.createElement("p");
+          description.textContent = item.description;
+          const levelText = document.createElement("p");
+          levelText.className = "item-level";
+          levelText.textContent = level ? `等级 ${level} / ${MAX_LEVEL} · 冷却 ${cooldown(level)} 秒` : "尚未解锁 · 冷却 120 秒";
+          copy.append(title, description, levelText);
+          const buy = document.createElement("button");
+          buy.className = `button item-buy${level === 0 ? " primary" : ""}`;
+          buy.textContent = maxed ? "已达最高级" : level === 0 ? `解锁 · ${item.baseCost} 金币` : `升级 · ${upgradeCost(level)} 金币`;
+          buy.disabled = maxed || save.coins < upgradeCost(level);
+          buy.addEventListener("click", () => purchase(key));
+          row.append(icon, copy, buy);
+          list.append(row);
+        }
+      }
+      function purchase(key) {
+        const level = save.items[key];
+        if (level >= MAX_LEVEL) return;
+        const cost = upgradeCost(level);
+        if (save.coins < cost) { showToast("金币不够，再跑一程吧。"); return; }
+        save.coins -= cost;
+        save.items[key] += 1;
+        persist();
+        renderShop();
+        showToast(`${itemInfo[key].name}已${level ? "升级" : "解锁"}至 Lv.${save.items[key]}。`);
+      }
+
+      function beginRun() {
+        currentName();
+        game = {
+          running: true, distance: 0, speed: 8, runCoins: 0, elapsed: 0,
+          playerY: 0, verticalSpeed: 0, duckUntil: 0, obstacles: [], coins: [], particles: [],
+          nextObstacle: 0, nextCoin: 280, doubleUntil: 0,
+          flightRemaining: 0, flightStoredSpeed: 0, flightCooldownUntil: 0, doubleCooldownUntil: 0,
+          flightActive: false
+        };
+        spawnObstacle(true);
+        document.getElementById("game-message").classList.remove("show");
+        showView("game-view");
+        updateHud();
+        cancelAnimationFrame(animationFrame);
+        lastFrame = performance.now();
+        animationFrame = requestAnimationFrame(frame);
+      }
+
+      function jump() {
+        if (!game?.running || game.playerY !== 0 || game.elapsed < game.duckUntil) return;
+        game.verticalSpeed = 480;
+      }
+      function duck(active) {
+        if (!game?.running) return;
+        game.duckUntil = active ? Infinity : game.elapsed;
+      }
+      function activateFlight() {
+        if (!game?.running) return;
+        const level = save.items.flight;
+        if (!level) { showToast("先去道具商城解锁飞行器。"); return; }
+        if (game.elapsed < game.flightCooldownUntil || game.flightActive) { showToast(`飞行器冷却中：${Math.ceil(game.flightCooldownUntil - game.elapsed)} 秒`); return; }
+        game.flightStoredSpeed = game.speed;
+        game.speed = MAX_SPEED;
+        game.flightRemaining = 500 + .5 * (level - 1);
+        game.flightActive = true;
+        game.flightCooldownUntil = game.elapsed + cooldown(level);
+        showToast(`飞行器启动：100 m/s，飞行距离 ${game.flightRemaining.toFixed(1)} m。`);
+      }
+      function activateDouble() {
+        if (!game?.running) return;
+        const level = save.items.double;
+        if (!level) { showToast("先去道具商城解锁双倍金币。"); return; }
+        if (game.elapsed < game.doubleCooldownUntil) { showToast(`双倍金币冷却中：${Math.ceil(game.doubleCooldownUntil - game.elapsed)} 秒`); return; }
+        const duration = 5 + .5 * (level - 1);
+        game.doubleUntil = game.elapsed + duration;
+        game.doubleCooldownUntil = game.elapsed + cooldown(level);
+        showToast(`双倍金币已启动，持续 ${duration.toFixed(1)} 秒。`);
+      }
+
+      function spawnObstacle(initial = false) {
+        const roll = Math.random();
+        const type = roll < .42 ? "cactus" : roll < .73 ? "overhead" : "fence";
+        const obstacle = { type, x: initial ? 540 : canvas.width + 20, w: type === "cactus" ? 40 + Math.random() * 20 : 54, h: type === "cactus" ? 48 + Math.random() * 24 : type === "overhead" ? 40 : 60 };
+        game.obstacles.push(obstacle);
+        game.nextObstacle = 900 + Math.random() * 150;
+      }
+      function spawnCoins() {
+        const count = 3 + Math.floor(Math.random() * 3);
+        const high = Math.random() < .5;
+        for (let i = 0; i < count; i++) game.coins.push({ x: canvas.width + 20 + i * 36, y: high ? 235 : 335, collected: false, pulse: Math.random() * 6 });
+        game.nextCoin = canvas.width + 330 + Math.random() * 310;
+      }
+      function collectCoin() {
+        const multiplier = game.elapsed < game.doubleUntil ? 2 : 1;
+        game.runCoins += multiplier;
+        save.coins += multiplier;
+        for (let i = 0; i < 7; i++) game.particles.push({ x: 150 + Math.random() * 18, y: 345 - Math.random() * 38, vx: (Math.random() - .5) * 100, vy: -Math.random() * 120, life: .45, color: "#d7f36a" });
+        persist();
+      }
+      function hitObstacle(obstacle) {
+        if (game.flightActive) return false;
+        const nearPlayer = obstacle.x < 160 && obstacle.x + obstacle.w > 130;
+        if (!nearPlayer) return false;
+        const jumping = game.playerY > obstacle.h + 6;
+        const crouching = game.elapsed < game.duckUntil;
+        if (obstacle.type === "cactus") return !jumping;
+        if (obstacle.type === "overhead") return !crouching;
+        return !(jumping || crouching);
+      }
+      function finishRun() {
+        game.running = false;
+        const score = Math.floor(game.distance);
+        const previousBest = Math.floor(save.bests[playerName] || 0);
+        save.bests[playerName] = Math.max(previousBest, score);
+        persist();
+        document.getElementById("result-score").textContent = `${score} m  ·  ${game.runCoins} 金币`;
+        document.getElementById("result-best").textContent = `历史最高：${Math.floor(save.bests[playerName])} m${score > previousBest ? "  ·  新纪录！" : ""}`;
+        document.getElementById("game-message").classList.add("show");
+      }
+      function updateHud() {
+        if (!game) return;
+        document.getElementById("hud-score").innerHTML = `${Math.floor(game.distance)} <span>m</span>`;
+        document.getElementById("hud-speed").innerHTML = `${Math.floor(game.speed)} <span>m/s</span>`;
+        document.getElementById("hud-coins").textContent = game.runCoins;
+        document.getElementById("hud-wallet").textContent = save.coins;
+      }
+
+      function frame(now) {
+        if (!game?.running) return;
+        const dt = Math.min((now - lastFrame) / 1000, .04);
+        lastFrame = now;
+        updateGame(dt);
+        drawGame();
+        updateHud();
+        if (game.running) animationFrame = requestAnimationFrame(frame);
+      }
+      function updateGame(dt) {
+        game.elapsed += dt;
+        const flying = game.flightActive;
+        if (flying) game.speed = MAX_SPEED;
+        else game.speed = Math.min(MAX_SPEED, game.speed + dt * 2.2);
+        const travel = game.speed * dt;
+        game.distance += travel;
+        const scroll = travel * PIXELS_PER_METER;
+        game.obstacles.forEach(obstacle => obstacle.x -= scroll);
+        game.coins.forEach(coin => coin.x -= scroll);
+        if (game.obstacles.length && game.obstacles[0].x + game.obstacles[0].w < -20) game.obstacles.shift();
+        if (game.coins.length && game.coins[0].x < -20) game.coins.shift();
+        game.nextObstacle -= scroll;
+        game.nextCoin -= scroll;
+        if (game.nextObstacle <= 0) spawnObstacle();
+        if (game.nextCoin <= 0) spawnCoins();
+
+        if (game.playerY > 0 || game.verticalSpeed > 0) {
+          game.playerY += game.verticalSpeed * dt;
+          game.verticalSpeed -= 580 * dt;
+          if (game.playerY <= 0) { game.playerY = 0; game.verticalSpeed = 0; }
+        }
+        for (const coin of game.coins) {
+          if (!coin.collected && coin.x < 172 && coin.x > 112 && (game.playerY > 8 || game.elapsed < game.duckUntil || coin.y > 280)) {
+            coin.collected = true;
+            collectCoin();
+          }
+        }
+        for (const obstacle of game.obstacles) {
+          if (hitObstacle(obstacle)) { finishRun(); break; }
+        }
+        for (const particle of game.particles) {
+          particle.x += particle.vx * dt; particle.y += particle.vy * dt; particle.vy += 220 * dt; particle.life -= dt;
+        }
+        game.particles = game.particles.filter(particle => particle.life > 0);
+
+        if (flying) {
+          game.flightRemaining -= travel;
+          const safeAhead = game.obstacles.every(obstacle => obstacle.x > 140 + 5 * PIXELS_PER_METER || obstacle.x + obstacle.w < 110);
+          if (game.flightRemaining <= 0 && safeAhead) {
+            game.flightRemaining = 0;
+            game.flightActive = false;
+            game.speed = game.flightStoredSpeed;
+            showToast("安全落地，已恢复起飞前速度。");
+          }
+        }
+      }
+
+      function drawGame() {
+        const w = canvas.width, h = canvas.height, ground = 370;
+        context.clearRect(0, 0, w, h);
+        const sky = context.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0, "#b6dfcf"); sky.addColorStop(1, "#e8e1c8");
+        context.fillStyle = sky; context.fillRect(0, 0, w, h);
+        context.fillStyle = "#ff7862"; context.beginPath(); context.arc(780, 95, 48, 0, Math.PI * 2); context.fill();
+        context.fillStyle = "rgba(255,255,255,.62)";
+        for (const cloud of [[125,87,1],[440,128,.72],[665,192,.55]]) {
+          const [x,y,s] = cloud; context.beginPath(); context.ellipse(x,y,35*s,9*s,0,0,Math.PI*2); context.ellipse(x+25*s,y-6*s,22*s,11*s,0,0,Math.PI*2); context.ellipse(x-19*s,y-3*s,19*s,8*s,0,0,Math.PI*2); context.fill();
+        }
+        context.fillStyle = "#87b6a4"; context.beginPath(); context.moveTo(0,280); context.lineTo(120,212); context.lineTo(260,281); context.lineTo(415,204); context.lineTo(590,280); context.lineTo(755,218); context.lineTo(960,292); context.lineTo(960,ground); context.lineTo(0,ground); context.fill();
+        context.fillStyle = "#456d5b"; context.fillRect(0, ground, w, h-ground);
+        context.fillStyle = "#d7f36a"; context.fillRect(0, ground, w, 3);
+        context.fillStyle = "rgba(215,243,106,.28)";
+        const groundShift = (game.distance * PIXELS_PER_METER) % 70;
+        for (let x = -groundShift; x < w; x += 70) context.fillRect(x, ground+22, 24, 2);
+        const flying = game.flightActive;
+        const ducking = game.elapsed < game.duckUntil;
+        drawDinosaur(145, ground - game.playerY, ducking, flying);
+        for (const obstacle of game.obstacles) drawObstacle(obstacle, ground);
+        for (const coin of game.coins) if (!coin.collected) drawCoin(coin);
+        for (const particle of game.particles) { context.globalAlpha = Math.max(0, particle.life / .45); context.fillStyle = particle.color; context.fillRect(particle.x, particle.y, 4, 4); }
+        context.globalAlpha = 1;
+        if (flying) {
+          context.fillStyle = "rgba(215,243,106,.92)"; context.font = "500 13px 'DM Mono', monospace"; context.fillText(`FLIGHT MODE  ·  ${Math.max(0, game.flightRemaining).toFixed(0)} m`, 22, 30);
+          context.strokeStyle = "rgba(215,243,106,.42)"; context.setLineDash([6, 8]); context.beginPath(); context.moveTo(0, 345); context.lineTo(w, 345); context.stroke(); context.setLineDash([]);
+        }
+        if (game.elapsed < game.doubleUntil) {
+          context.fillStyle = "#ff7862"; context.font = "500 13px 'DM Mono', monospace"; context.fillText(`COINS ×2  ·  ${(game.doubleUntil-game.elapsed).toFixed(1)}s`, 22, flying ? 51 : 30);
+        }
+      }
+
+      function drawDinosaur(x, feet, ducking, flying) {
+        context.save();
+        context.lineJoin = "round";
+        context.lineCap = "round";
+        context.lineWidth = 3;
+        const stride = game?.running ? Math.sin(game.elapsed * 16) * 5 : 0;
+        if (flying) { context.shadowColor = "rgba(215,243,106,.7)"; context.shadowBlur = 20; }
+        context.fillStyle = "#315e49";
+        context.strokeStyle = "#18251e";
+        if (ducking) {
+          context.beginPath();
+          context.moveTo(x-24, feet-27); context.quadraticCurveTo(x-42, feet-39, x-53, feet-34);
+          context.lineTo(x-40, feet-22); context.lineTo(x-52, feet-17); context.lineTo(x-25, feet-12); context.closePath();
+          context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x-29, feet-35, 62, 27, 11); context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x+11, feet-52, 39, 29, 11); context.fill(); context.stroke();
+          context.fillStyle = "#a9ddd1"; context.beginPath(); context.roundRect(x-4, feet-23, 28, 12, 6); context.fill();
+          context.fillStyle = "#d7f36a"; context.fillRect(x-15, feet-34, 5, 5); context.fillRect(x-4, feet-33, 5, 5);
+          context.fillStyle = "#f0eddf"; context.beginPath(); context.arc(x+37, feet-43, 5, 0, Math.PI*2); context.fill();
+          context.fillStyle = "#18251e"; context.beginPath(); context.arc(x+39, feet-43, 2.5, 0, Math.PI*2); context.fill();
+          context.fillStyle = "#253b30"; context.fillRect(x-18, feet-10, 14, 8); context.fillRect(x+12, feet-10, 14, 8);
+        } else {
+          context.beginPath();
+          context.moveTo(x-19, feet-49); context.quadraticCurveTo(x-38, feet-64, x-53, feet-54);
+          context.lineTo(x-39, feet-42); context.quadraticCurveTo(x-47, feet-34, x-39, feet-29);
+          context.lineTo(x-15, feet-36); context.closePath(); context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x-25, feet-65, 53, 51, 16); context.fill(); context.stroke();
+          context.beginPath();
+          context.moveTo(x-18, feet-62); context.lineTo(x-9, feet-78); context.lineTo(x, feet-65);
+          context.lineTo(x+10, feet-82); context.lineTo(x+18, feet-64); context.closePath();
+          context.fillStyle = "#d7f36a"; context.fill(); context.stroke();
+          context.fillStyle = "#a9ddd1"; context.beginPath(); context.roundRect(x-3, feet-47, 24, 29, 11); context.fill();
+          context.fillStyle = "#315e49"; context.beginPath(); context.roundRect(x+5, feet-48, 21, 8, 4); context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x+8, feet-92, 40, 35, 13); context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x+34, feet-78, 25, 18, 8); context.fill(); context.stroke();
+          context.fillStyle = "#d7f36a"; context.fillRect(x+14, feet-88, 5, 7); context.fillRect(x+25, feet-87, 5, 7);
+          context.fillStyle = "#f0eddf"; context.beginPath(); context.arc(x+42, feet-82, 6, 0, Math.PI*2); context.fill();
+          context.fillStyle = "#18251e"; context.beginPath(); context.arc(x+44, feet-82, 3, 0, Math.PI*2); context.fill();
+          context.fillStyle = "#ff7862"; context.beginPath(); context.arc(x+55, feet-69, 2.5, 0, Math.PI*2); context.fill();
+          context.fillStyle = "#253b30"; context.beginPath(); context.roundRect(x-14+stride, feet-20, 13, 19, 5); context.fill(); context.stroke();
+          context.beginPath(); context.roundRect(x+6-stride, feet-20, 13, 19, 5); context.fill(); context.stroke();
+          context.fillStyle = "#f0eddf"; context.fillRect(x-14+stride, feet-4, 13, 3); context.fillRect(x+6-stride, feet-4, 13, 3);
+        }
+        context.restore();
+      }
+      function drawObstacle(obstacle, ground) {
+        context.save(); context.translate(Math.round(obstacle.x), 0);
+        if (obstacle.type === "cactus") {
+          context.fillStyle = "#287b61"; context.fillRect(12, ground-obstacle.h, 18, obstacle.h); context.fillRect(0, ground-obstacle.h+17, 15, 9); context.fillRect(0, ground-obstacle.h+8, 8, 18); context.fillRect(27, ground-obstacle.h+27, 16, 8); context.fillRect(36, ground-obstacle.h+19, 8, 18);
+          context.fillStyle = "#a9ddd1"; context.fillRect(17, ground-obstacle.h+8, 2, 8); context.fillRect(24, ground-obstacle.h+22, 2, 8);
+        } else if (obstacle.type === "overhead") {
+          // 高栏杆（只能下蹲）：上半部分为实心挡板，挡板下端稍高于下蹲头顶，只能下蹲钻过；两侧立柱落地支撑
+          const boardBottom = ground - 56;   // 挡板下端（地面以上 56px，稍高于下蹲头 52px）
+          const boardTop = ground - 108;     // 挡板上端（足够高，跳不过去）
+          const postW = 9;
+          context.fillStyle = "#bc604e";
+          // 实心挡板（上半部分）
+          context.fillRect(0, boardTop, obstacle.w, boardBottom - boardTop);
+          // 挡板底边加一条深色封边，强化"只能下蹲"的视觉
+          context.fillStyle = "#8f4a3c";
+          context.fillRect(0, boardBottom - 3, obstacle.w, 3);
+          // 两侧立柱落地支撑挡板
+          context.fillStyle = "#bc604e";
+          context.fillRect(4, boardTop, postW, ground - boardTop);
+          context.fillRect(obstacle.w - 4 - postW, boardTop, postW, ground - boardTop);
+          // 地面底座
+          context.fillStyle = "#8f4a3c";
+          context.fillRect(2, ground - 5, obstacle.w - 4, 5);
+          // 挡板上的警示斜纹装饰
+          context.fillStyle = "#f0eddf";
+          context.fillRect(14, boardTop + 10, 5, 14);
+          context.fillRect(30, boardTop + 10, 5, 14);
+        } else {
+          // 矮栅栏（可跳可蹲）：顶部横杆 + 两侧立柱落地。横杆高于下蹲头顶（可钻过）、低于站立头（会撞）、可跳跃越过
+          const top = ground - 66, barH = 8, postW = 7;
+          context.fillStyle = "#c77948";
+          context.fillRect(0, top, obstacle.w, barH);
+          context.fillRect(4, top, postW, 66);
+          context.fillRect(obstacle.w - 4 - postW, top, postW, 66);
+          context.fillStyle = "#f0eddf";
+          context.fillRect(14, top + 2, 4, 4);
+          context.fillRect(28, top + 2, 4, 4);
+        }
+        context.restore();
+      }
+      function drawCoin(coin) {
+        const bob = Math.sin(game.elapsed * 5 + coin.pulse) * 4;
+        context.fillStyle = "#e1a83e"; context.beginPath(); context.arc(coin.x, coin.y + bob, 10, 0, Math.PI * 2); context.fill();
+        context.strokeStyle = "#fff0aa"; context.lineWidth = 2; context.beginPath(); context.arc(coin.x, coin.y + bob, 6, 0, Math.PI * 2); context.stroke();
+      }
+
+      document.getElementById("start-button").addEventListener("click", beginRun);
+      document.getElementById("classic-button").addEventListener("click", () => { currentName(); document.getElementById("classic-panel").hidden = false; });
+      document.getElementById("classic-cancel").addEventListener("click", () => { document.getElementById("classic-panel").hidden = true; });
+      document.getElementById("challenge-button").addEventListener("click", () => showToast("挑战模式即将上线，敬请期待。"));
+      document.getElementById("continue-button").addEventListener("click", beginRun);
+      document.getElementById("leaderboard-button").addEventListener("click", () => { currentName(); showView("leaderboard-view"); });
+      document.getElementById("shop-button").addEventListener("click", () => { currentName(); showView("shop-view"); });
+      document.querySelectorAll("[data-home]").forEach(button => button.addEventListener("click", () => showView("home-view")));
+      document.getElementById("result-home-button").addEventListener("click", () => showView("home-view"));
+      nameInput.addEventListener("change", () => { currentName(); updateHomeStats(); });
+      document.getElementById("touch-jump").addEventListener("pointerdown", event => { event.preventDefault(); jump(); });
+      document.getElementById("touch-duck").addEventListener("pointerdown", event => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); duck(true); });
+      document.getElementById("touch-duck").addEventListener("pointerup", () => duck(false));
+      document.getElementById("touch-duck").addEventListener("pointercancel", () => duck(false));
+      document.getElementById("touch-flight").addEventListener("pointerdown", activateFlight);
+      document.getElementById("touch-double").addEventListener("pointerdown", activateDouble);
+      window.addEventListener("keydown", event => {
+        if (event.code === "Space" || event.code === "ArrowUp") { event.preventDefault(); jump(); }
+        if (event.code === "ArrowDown") { event.preventDefault(); duck(true); }
+        if (event.code === "KeyF") activateFlight();
+        if (event.code === "KeyG") activateDouble();
+      });
+      window.addEventListener("keyup", event => { if (event.code === "ArrowDown") duck(false); });
+      window.addEventListener("blur", () => duck(false));
+
+      updateHomeStats();
+      drawTitleScene();
+      function drawTitleScene() {
+        context.fillStyle = "#b6dfcf"; context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#ff7862"; context.beginPath(); context.arc(780, 95, 48, 0, Math.PI * 2); context.fill();
+        context.fillStyle = "#87b6a4"; context.beginPath(); context.moveTo(0,280); context.lineTo(150,205); context.lineTo(330,285); context.lineTo(530,210); context.lineTo(760,285); context.lineTo(960,220); context.lineTo(960,370); context.lineTo(0,370); context.fill();
+        context.fillStyle = "#456d5b"; context.fillRect(0,370,960,70); context.fillStyle = "#d7f36a"; context.fillRect(0,370,960,3);
+        drawDinosaur(145, 370, false, false);
+        context.fillStyle = "#287b61"; context.fillRect(675,318,20,52); context.fillRect(663,334,15,8); context.fillRect(663,324,8,20); context.fillRect(695,342,16,8); context.fillRect(703,334,8,18);
+      }
+    })();
+  </script>
+</body>
+</html>
