@@ -32,7 +32,12 @@
       background-image: radial-gradient(rgba(240, 237, 223, .1) .7px, transparent .7px);
       background-size: 7px 7px;
       font-family: var(--mono);
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
+    input, textarea { -webkit-user-select: text; user-select: text; }
     button, input { font: inherit; }
     button { color: inherit; }
     .shell { width: min(1120px, calc(100% - 48px)); margin: auto; padding: 26px 0 42px; }
@@ -54,6 +59,11 @@
     .mode-panel { margin-top: 14px; padding: 16px 18px; border: 1px solid var(--line); background: rgba(240,237,223,.04); animation: enter .24s ease-out both; }
     .mode-panel-note { margin: 0 0 14px; color: var(--paper-dim); font-family: var(--display); font-size: 15px; line-height: 1.6; }
     .mode-panel-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .difficulty-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .difficulty-label { color: var(--paper-dim); font-size: 12px; }
+    .difficulty-btn { min-height: 34px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; font-size: 12px; transition: background .15s, color .15s, border-color .15s; }
+    .difficulty-btn.active { border-color: var(--lime); background: var(--lime); color: var(--ink); font-weight: 500; }
+    .difficulty-btn.hard-active { border-color: var(--coral); background: var(--coral); color: var(--ink); font-weight: 500; }
     .button { min-height: 43px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; transition: background .16s, color .16s, border-color .16s, transform .16s; }
     .button:hover { border-color: var(--lime); transform: translateY(-2px); }
     .button.primary { border-color: var(--lime); background: var(--lime); color: var(--ink); font-weight: 500; }
@@ -111,7 +121,7 @@
     .key-hint { display: flex; flex-wrap: wrap; gap: 14px; }
     kbd { padding: 3px 6px; border: 1px solid var(--line); color: var(--paper); font-family: var(--mono); }
     .touch-controls { display: flex; flex-wrap: wrap; gap: 10px; }
-    .touch-controls button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-width: 72px; min-height: 60px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--ink-soft); color: var(--lime); cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; transition: background .15s, border-color .15s, transform .1s; }
+    .touch-controls button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-width: 72px; min-height: 60px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--ink-soft); color: var(--lime); cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-tap-highlight-color: rgba(0,0,0,0); transition: background .15s, border-color .15s, transform .1s; }
     .touch-controls button:active { background: rgba(215,243,106,.18); border-color: var(--lime); transform: scale(.96); }
     .touch-controls button .tc-icon { font-size: 20px; line-height: 1; }
     .touch-controls button .tc-label { font-size: 11px; color: var(--paper); }
@@ -119,6 +129,41 @@
     .toast { position: fixed; right: 20px; bottom: 20px; z-index: 9; max-width: min(360px, calc(100vw - 40px)); padding: 12px 16px; border-left: 3px solid var(--lime); background: var(--paper); color: var(--ink); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s; }
     .toast.show { opacity: 1; transform: translateY(0); }
     .footer { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); color: rgba(240,237,223,.46); font-size: 9px; }
+
+    /* —— 挑战模式 / 副本对战 —— */
+    .scenario-intro { margin: 18px 0 24px; color: var(--paper-dim); font-family: var(--display); font-size: 16px; line-height: 1.7; }
+    .scenario-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+    .scenario-card { position: relative; overflow: hidden; padding: 24px; border: 1px solid var(--line); background: var(--ink-soft); cursor: pointer; transition: border-color .16s, transform .16s; }
+    .scenario-card:hover { border-color: var(--coral); transform: translateY(-3px); }
+    .scenario-card .sc-flag { color: var(--coral); font-size: 11px; letter-spacing: 2px; }
+    .scenario-card h3 { margin: 12px 0 8px; font-family: var(--display); font-size: 30px; font-weight: 400; color: var(--paper); }
+    .scenario-card p { margin: 0 0 16px; color: var(--paper-dim); font-size: 12px; line-height: 1.7; }
+    .scenario-card .sc-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+    .scenario-card .sc-meta span { padding: 3px 8px; border: 1px solid var(--line); color: var(--paper-dim); font-size: 10px; }
+    .scenario-card .sc-go { margin-top: 16px; color: var(--lime); font-size: 12px; }
+    .battle-view { padding-top: 25px; }
+    .battle-hud { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .battle-title { display: flex; flex-direction: column; gap: 4px; }
+    .battle-title strong { color: var(--paper); font-family: var(--display); font-size: 20px; font-weight: 400; }
+    .battle-canvas-wrap { position: relative; margin-top: 12px; border: 1px solid var(--line); background: #b6dfcf; }
+    #battle-canvas { display: block; width: 100%; height: auto; aspect-ratio: 960 / 440; }
+    .battle-overlay { position: absolute; inset: 0; display: none; place-items: center; background: rgba(24,37,30,.78); text-align: center; }
+    .battle-overlay.show { display: grid; }
+    .battle-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .battle-status { display: flex; flex-direction: column; gap: 12px; }
+    .fighter-stat { padding: 12px 14px; border: 1px solid var(--line); background: var(--ink); }
+    .fighter-stat.boss-stat { border-color: rgba(255,120,98,.4); }
+    .fighter-name { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--paper); font-family: var(--display); font-size: 17px; }
+    .lv-badge { padding: 1px 7px; background: var(--lime); color: var(--ink); font-size: 11px; font-family: var(--mono); }
+    .hp-bar { position: relative; height: 16px; border: 1px solid var(--line); background: rgba(240,237,223,.06); overflow: hidden; }
+    .hp-bar .hp-fill { height: 100%; background: var(--lime); transition: width .18s ease; }
+    .hp-bar.boss .hp-fill { background: var(--coral); }
+    .hp-text { position: absolute; inset: 0; display: grid; place-items: center; font-size: 10px; color: var(--paper); text-shadow: 0 1px 2px rgba(24,37,30,.6); }
+    .battle-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .info-cell { padding: 12px 14px; border: 1px solid var(--line); background: var(--ink); }
+    .info-cell small { display: block; margin-bottom: 5px; color: var(--paper-dim); font-size: 9px; }
+    .info-cell strong { color: var(--lime); font-size: 16px; font-weight: 500; }
+    .battle-controls { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 13px 0; color: var(--paper-dim); font-size: 10px; }
 
     @media (max-width: 760px) {
       .shell { width: min(100% - 28px, 580px); padding-top: 15px; }
@@ -137,6 +182,8 @@
       .item-icon { width: 46px; height: 46px; }
       .item-buy { grid-column: 2; justify-self: start; }
       .page-head h2 { font-size: 34px; }
+      .battle-panels { grid-template-columns: 1fr; }
+      .battle-controls { flex-direction: column; align-items: flex-start; }
     }
     @media (max-width: 430px) {
       .profile { flex-wrap: wrap; }
@@ -169,6 +216,11 @@
           </div>
           <div class="mode-panel" id="classic-panel" hidden>
             <p class="mode-panel-note">经典模式 · 无尽跑酷，躲避障碍、收集金币、刷新纪录。</p>
+            <div class="difficulty-row">
+              <span class="difficulty-label">难度</span>
+              <button class="difficulty-btn active" id="diff-normal" type="button">普通</button>
+              <button class="difficulty-btn" id="diff-hard" type="button">困难</button>
+            </div>
             <div class="mode-panel-actions">
               <button class="button primary" id="start-button">▶ 开始游戏</button>
               <button class="button" id="classic-cancel">← 返回</button>
@@ -200,8 +252,66 @@
       </div>
     </section>
 
+    <section class="view" id="challenge-view">
+      <div class="page-head"><div><div class="eyebrow">SCENARIO / 副本</div><h2>挑战模式</h2></div><button class="button back-button" data-home aria-label="返回主界面" title="返回主界面">←</button></div>
+      <p class="scenario-intro">选择剧本，操控角色击败强敌。首个剧本已开放，更多英雄即将登场。</p>
+      <div class="scenario-list" id="scenario-list"></div>
+    </section>
+
+    <section class="view battle-view" id="battle-view">
+      <div class="battle-hud">
+        <div class="battle-title">
+          <span class="eyebrow" id="battle-scenario">武圣之威</span>
+          <strong id="battle-stage">第一阶段 · 清剿小怪</strong>
+        </div>
+        <button class="button back-button" id="battle-quit" aria-label="退出挑战" title="退出挑战">✕ 退出</button>
+      </div>
+      <div class="battle-canvas-wrap">
+        <canvas id="battle-canvas" width="960" height="440" aria-label="副本对战场景"></canvas>
+        <div class="battle-overlay" id="battle-overlay">
+          <div class="result-box">
+            <div class="eyebrow" id="battle-result-tag">VICTORY</div>
+            <h2 id="battle-result-title">武圣显威！</h2>
+            <div class="result-score" id="battle-result-detail">击败华雄</div>
+            <div class="result-best" id="battle-result-stats"></div>
+            <div class="result-actions">
+              <button class="button primary" id="battle-retry">↻ 再来一局</button>
+              <button class="button" id="battle-home">⌂ 回到主界面</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="battle-panels">
+        <div class="battle-status">
+          <div class="fighter-stat">
+            <div class="fighter-name">关羽 <span class="lv-badge" id="battle-level">Lv.1</span></div>
+            <div class="hp-bar"><div class="hp-fill" id="battle-player-hp" style="width:100%"></div><span class="hp-text" id="battle-player-hp-text">4000 / 4000</span></div>
+          </div>
+          <div class="fighter-stat boss-stat">
+            <div class="fighter-name" id="battle-boss-name">华雄</div>
+            <div class="hp-bar boss"><div class="hp-fill" id="battle-boss-hp" style="width:100%"></div><span class="hp-text" id="battle-boss-hp-text">10000 / 10000</span></div>
+          </div>
+        </div>
+        <div class="battle-info">
+          <div class="info-cell"><small>击杀</small><strong id="battle-kills">0 / 50</strong></div>
+          <div class="info-cell"><small>攻击力</small><strong id="battle-atk">10</strong></div>
+          <div class="info-cell"><small>暴击率</small><strong id="battle-crit">10%</strong></div>
+          <div class="info-cell"><small>暴击伤害</small><strong id="battle-critdmg">50</strong></div>
+        </div>
+        <div class="battle-controls">
+          <div class="key-hint"><span><kbd>A</kbd>/<kbd>←</kbd> 左移</span><span><kbd>D</kbd>/<kbd>→</kbd> 右移</span><span><kbd>W</kbd>/<kbd>↑</kbd> 跳跃</span><span><kbd>J</kbd>/<kbd>Space</kbd> 挥刀</span></div>
+          <div class="touch-controls">
+            <button id="touch-left" aria-label="左移"><span class="tc-icon">◀</span><span class="tc-label">左移</span></button>
+            <button id="touch-jump-battle" aria-label="跳跃"><span class="tc-icon">⬆</span><span class="tc-label">跳跃</span></button>
+            <button id="touch-attack" aria-label="挥刀" class="tc-accent"><span class="tc-icon">⚔</span><span class="tc-label">挥刀</span></button>
+            <button id="touch-right" aria-label="右移"><span class="tc-icon">▶</span><span class="tc-label">右移</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="view" id="leaderboard-view">
-      <div class="page-head"><div><div class="eyebrow">LOCAL RECORDS</div><h2>跑者榜</h2></div><button class="button back-button" data-home aria-label="返回主界面" title="返回主界面">←</button></div>
+      <div class="page-head"><div><div class="eyebrow">GLOBAL RANKING</div><h2>跑者榜</h2></div><button class="button back-button" data-home aria-label="返回主界面" title="返回主界面">←</button></div>
       <div class="table-head"><span>名次</span><span>跑者</span><span class="leader-score">最佳距离</span></div>
       <div id="leaderboard-list"></div>
     </section>
@@ -215,7 +325,7 @@
     <section class="view game-view" id="game-view">
       <div class="game-hud">
         <div class="hud-cell"><small>距离 / SCORE</small><strong id="hud-score">0 <span>m</span></strong></div>
-        <div class="hud-cell"><small>速度 / SPEED</small><strong id="hud-speed">8 <span>m/s</span></strong></div>
+        <div class="hud-cell"><small>速度 / SPEED</small><strong id="hud-speed">30 <span>m/s</span></strong></div>
         <div class="hud-cell"><small>本局金币 / RUN COINS</small><strong id="hud-coins">0</strong></div>
         <div class="hud-cell"><small>随身金币 / WALLET</small><strong id="hud-wallet">0</strong></div>
       </div>
@@ -229,6 +339,7 @@
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
   <script>
     (() => {
       "use strict";
@@ -236,9 +347,12 @@
       const STORAGE_KEY = "rough-run-save-v1";
       const MAX_LEVEL = 99;
       const MAX_SPEED = 100;
+      const HARD_MAX_SPEED = 175;
       const PIXELS_PER_METER = 3.2;
       const canvas = document.getElementById("game-canvas");
       const context = canvas.getContext("2d");
+      const battleCanvas = document.getElementById("battle-canvas");
+      const battleContext = battleCanvas.getContext("2d");
       const views = [...document.querySelectorAll(".view")];
       const nameInput = document.getElementById("player-name");
 
@@ -246,9 +360,31 @@
       let save = loadSave();
       let playerName = "跑者";
       let game = null;
+      let difficulty = "normal";
+      let battle = null;
+      let battleAnimation = 0;
+      let battleLastFrame = 0;
       let lastFrame = 0;
       let animationFrame = 0;
       let toastTimer = 0;
+
+      // —— 云端排行榜 ——
+      let cloud = null;
+      const cloudConfig = {
+        endpoint: "https://rough-run.app.workbuddy.host",
+        oauthRelayBaseUrl: "https://www.workbuddy.cn/v2/as/genie-baas/oauth",
+        publishableKey: "wbpk_Yuu9cBFlgsGrB07RQoe1bp_w5dv1iGUdBDMj5mTRo0T3gYO3pJe81M9"
+      };
+      function initCloud() {
+        try {
+          if (typeof WorkBuddyCloud !== "undefined" && WorkBuddyCloud.createWorkBuddyCloud) {
+            cloud = WorkBuddyCloud.createWorkBuddyCloud(cloudConfig);
+          }
+        } catch (err) {
+          cloud = null;
+        }
+      }
+      initCloud();
 
       function loadSave() {
         try {
@@ -275,6 +411,7 @@
         if (id === "leaderboard-view") renderLeaderboard();
         if (id === "shop-view") renderShop();
         if (id === "home-view") updateHomeStats();
+        if (id === "challenge-view") renderScenarioList();
       }
       function updateHomeStats() {
         document.getElementById("home-coins").textContent = save.coins;
@@ -289,9 +426,7 @@
         toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
       }
 
-      function renderLeaderboard() {
-        const list = document.getElementById("leaderboard-list");
-        const entries = Object.entries(save.bests).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh-CN"));
+      function renderLeaderboardRows(list, entries) {
         list.replaceChildren();
         if (!entries.length) {
           const empty = document.createElement("div");
@@ -300,20 +435,61 @@
           list.append(empty);
           return;
         }
-        entries.forEach(([name, score], index) => {
+        entries.slice(0, 100).forEach((entry, index) => {
           const row = document.createElement("div");
           row.className = "leader-row";
           const rank = document.createElement("span");
           rank.className = "leader-rank";
           rank.textContent = String(index + 1).padStart(2, "0");
           const runner = document.createElement("span");
-          runner.textContent = name;
+          runner.textContent = entry.name;
           const distance = document.createElement("span");
           distance.className = "leader-score";
-          distance.textContent = `${Math.floor(score)} m`;
+          distance.textContent = `${Math.floor(entry.score)} m`;
           row.append(rank, runner, distance);
           list.append(row);
         });
+      }
+
+      async function renderLeaderboard() {
+        const list = document.getElementById("leaderboard-list");
+        // 先显示加载中，避免空白
+        list.replaceChildren();
+        const loading = document.createElement("div");
+        loading.className = "empty-state";
+        loading.textContent = "正在同步全服排行榜…";
+        list.append(loading);
+
+        // 合并：云端成绩 + 本地成绩（同名取最高），保证老玩家本地记录不丢
+        const merged = new Map();
+        for (const [name, score] of Object.entries(save.bests)) {
+          merged.set(name, Math.floor(score));
+        }
+
+        if (cloud) {
+          try {
+            const { data, error } = await cloud.database
+              .from("leaderboard")
+              .select("runner_name, score")
+              .order("score", { ascending: false })
+              .limit(100);
+            if (!error && Array.isArray(data)) {
+              for (const row of data) {
+                const name = row.runner_name || "匿名跑者";
+                const score = Math.floor(row.score || 0);
+                const prev = merged.get(name) || 0;
+                merged.set(name, Math.max(prev, score));
+              }
+            }
+          } catch (err) {
+            // 云端读取失败，退回到本地成绩
+          }
+        }
+
+        const entries = [...merged.entries()]
+          .map(([name, score]) => ({ name, score }))
+          .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, "zh-CN"));
+        renderLeaderboardRows(list, entries);
       }
 
       const itemInfo = {
@@ -369,7 +545,8 @@
       function beginRun() {
         currentName();
         game = {
-          running: true, distance: 0, speed: 8, runCoins: 0, elapsed: 0,
+          running: true, distance: 0, speed: 30, runCoins: 0, elapsed: 0,
+          maxSpeed: difficulty === "hard" ? HARD_MAX_SPEED : MAX_SPEED,
           playerY: 0, verticalSpeed: 0, duckUntil: 0, obstacles: [], coins: [], particles: [],
           nextObstacle: 0, nextCoin: 280, doubleUntil: 0,
           flightRemaining: 0, flightStoredSpeed: 0, flightCooldownUntil: 0, doubleCooldownUntil: 0,
@@ -386,14 +563,17 @@
 
       function jump() {
         if (!game?.running || game.playerY !== 0 || game.elapsed < game.duckUntil) return;
-        game.verticalSpeed = 480;
+        game.verticalSpeed = 400;
       }
       function duck(active) {
         if (!game?.running) return;
+        // 禁止空中下蹲：跳跃/滞空时（脚未着地）不允许进入下蹲
+        if (active && (game.playerY > 0 || game.verticalSpeed > 0)) return;
         game.duckUntil = active ? Infinity : game.elapsed;
       }
       function activateFlight() {
         if (!game?.running) return;
+        if (difficulty === "hard") { showToast("困难模式已禁用飞行器。"); return; }
         const level = save.items.flight;
         if (!level) { showToast("先去道具商城解锁飞行器。"); return; }
         if (game.elapsed < game.flightCooldownUntil || game.flightActive) { showToast(`飞行器冷却中：${Math.ceil(game.flightCooldownUntil - game.elapsed)} 秒`); return; }
@@ -420,7 +600,8 @@
         const type = roll < .42 ? "cactus" : roll < .73 ? "overhead" : "fence";
         const obstacle = { type, x: initial ? 540 : canvas.width + 20, w: type === "cactus" ? 40 + Math.random() * 20 : 54, h: type === "cactus" ? 48 + Math.random() * 24 : type === "overhead" ? 40 : 60 };
         game.obstacles.push(obstacle);
-        game.nextObstacle = 900 + Math.random() * 150;
+        // 困难模式：障碍物生成更快、间隔更小
+        game.nextObstacle = difficulty === "hard" ? 480 + Math.random() * 120 : 900 + Math.random() * 150;
       }
       function spawnCoins() {
         const count = 3 + Math.floor(Math.random() * 3);
@@ -451,9 +632,25 @@
         const previousBest = Math.floor(save.bests[playerName] || 0);
         save.bests[playerName] = Math.max(previousBest, score);
         persist();
+        submitScore(score);
         document.getElementById("result-score").textContent = `${score} m  ·  ${game.runCoins} 金币`;
         document.getElementById("result-best").textContent = `历史最高：${Math.floor(save.bests[playerName])} m${score > previousBest ? "  ·  新纪录！" : ""}`;
         document.getElementById("game-message").classList.add("show");
+      }
+
+      // 提交成绩到全服排行榜（云端）；每人只保留一条最高成绩，由数据库层保证取 max。失败静默，不影响游戏
+      async function submitScore(score) {
+        if (!cloud || score <= 0) return;
+        const name = (playerName || "跑者").trim() || "跑者";
+        try {
+          await cloud.database.rpc("submit_leaderboard_score", {
+            p_name: name,
+            p_score: score,
+            p_difficulty: difficulty === "hard" ? "hard" : "normal"
+          });
+        } catch (err) {
+          // 云端不可用或网络失败时静默，本地成绩已保存
+        }
       }
       function updateHud() {
         if (!game) return;
@@ -476,7 +673,7 @@
         game.elapsed += dt;
         const flying = game.flightActive;
         if (flying) game.speed = MAX_SPEED;
-        else game.speed = Math.min(MAX_SPEED, game.speed + dt * 2.2);
+        else game.speed = Math.min(game.maxSpeed, game.speed + dt * 2.6);
         const travel = game.speed * dt;
         game.distance += travel;
         const scroll = travel * PIXELS_PER_METER;
@@ -491,7 +688,7 @@
 
         if (game.playerY > 0 || game.verticalSpeed > 0) {
           game.playerY += game.verticalSpeed * dt;
-          game.verticalSpeed -= 580 * dt;
+          game.verticalSpeed -= 660 * dt;
           if (game.playerY <= 0) { game.playerY = 0; game.verticalSpeed = 0; }
         }
         for (const coin of game.coins) {
@@ -647,7 +844,19 @@
       document.getElementById("start-button").addEventListener("click", beginRun);
       document.getElementById("classic-button").addEventListener("click", () => { currentName(); document.getElementById("classic-panel").hidden = false; });
       document.getElementById("classic-cancel").addEventListener("click", () => { document.getElementById("classic-panel").hidden = true; });
-      document.getElementById("challenge-button").addEventListener("click", () => showToast("挑战模式即将上线，敬请期待。"));
+      document.getElementById("challenge-button").addEventListener("click", () => { currentName(); showView("challenge-view"); });
+      // 难度选择
+      document.getElementById("diff-normal").addEventListener("click", () => setDifficulty("normal"));
+      document.getElementById("diff-hard").addEventListener("click", () => setDifficulty("hard"));
+      function setDifficulty(mode) {
+        difficulty = mode;
+        const normalBtn = document.getElementById("diff-normal");
+        const hardBtn = document.getElementById("diff-hard");
+        normalBtn.classList.toggle("active", mode === "normal");
+        normalBtn.classList.remove("hard-active");
+        hardBtn.classList.toggle("active", mode === "hard");
+        hardBtn.classList.toggle("hard-active", mode === "hard");
+      }
       document.getElementById("continue-button").addEventListener("click", beginRun);
       document.getElementById("leaderboard-button").addEventListener("click", () => { currentName(); showView("leaderboard-view"); });
       document.getElementById("shop-button").addEventListener("click", () => { currentName(); showView("shop-view"); });
@@ -660,13 +869,20 @@
       document.getElementById("touch-duck").addEventListener("pointercancel", () => duck(false));
       document.getElementById("touch-flight").addEventListener("pointerdown", activateFlight);
       document.getElementById("touch-double").addEventListener("pointerdown", activateDouble);
+      // 触屏按键禁用长按选择/右键菜单/拖拽，避免长按失效
+      document.querySelectorAll(".touch-controls button").forEach(button => {
+        button.addEventListener("contextmenu", event => event.preventDefault());
+        button.addEventListener("selectstart", event => event.preventDefault());
+        button.addEventListener("dragstart", event => event.preventDefault());
+      });
       window.addEventListener("keydown", event => {
+        if (battle) return; // 战斗模式进行中，交由战斗逻辑处理
         if (event.code === "Space" || event.code === "ArrowUp") { event.preventDefault(); jump(); }
         if (event.code === "ArrowDown") { event.preventDefault(); duck(true); }
         if (event.code === "KeyF") activateFlight();
         if (event.code === "KeyG") activateDouble();
       });
-      window.addEventListener("keyup", event => { if (event.code === "ArrowDown") duck(false); });
+      window.addEventListener("keyup", event => { if (!battle && event.code === "ArrowDown") duck(false); });
       window.addEventListener("blur", () => duck(false));
 
       updateHomeStats();
@@ -679,6 +895,832 @@
         drawDinosaur(145, 370, false, false);
         context.fillStyle = "#287b61"; context.fillRect(675,318,20,52); context.fillRect(663,334,15,8); context.fillRect(663,324,8,20); context.fillRect(695,342,16,8); context.fillRect(703,334,8,18);
       }
+
+      // ===================== 挑战模式 / 副本对战 =====================
+      const SCENARIOS = [
+        {
+          id: "wusheng", name: "武圣之威", flag: "NO. 01 · 汜水关",
+          desc: "关羽单骑出战，先破五十敌军，再战华雄。刀起刀落，温酒未凉。",
+          hero: "关羽", boss: "华雄",
+          meta: ["小怪 ×50", "BOSS 华雄", "英雄 4000 HP"]
+        }
+      ];
+      function renderScenarioList() {
+        const list = document.getElementById("scenario-list");
+        list.replaceChildren();
+        for (const sc of SCENARIOS) {
+          const card = document.createElement("article");
+          card.className = "scenario-card";
+          const flag = document.createElement("div");
+          flag.className = "sc-flag";
+          flag.textContent = sc.flag;
+          const title = document.createElement("h3");
+          title.textContent = sc.name;
+          const desc = document.createElement("p");
+          desc.textContent = sc.desc;
+          const meta = document.createElement("div");
+          meta.className = "sc-meta";
+          sc.meta.forEach(m => { const s = document.createElement("span"); s.textContent = m; meta.append(s); });
+          const go = document.createElement("div");
+          go.className = "sc-go";
+          go.textContent = "▶ 进入副本";
+          card.append(flag, title, desc, meta, go);
+          card.addEventListener("click", () => startScenario(sc.id));
+          list.append(card);
+        }
+      }
+
+      // —— 战斗状态 ——
+      const BATTLE_GROUND = 350;              // 战斗地面 y 坐标
+      const MOB_COUNT = 50;
+      const MOVE_SPEED = 340;                 // 移动速度 px/s（主角，加快手感）
+
+      // —— 碰撞盒（hitbox）半宽：从中心 x 到身体边缘的距离，用于「攻击落到模型上才生效」——
+      const PLAYER_BODY_HALF = 17;            // 关羽身体半宽（绘制 x-17 ~ x+17）
+      const MOB_BODY_HALF = 12;               // 小怪身体半宽（绘制 x-12 ~ x+12）
+      const BOSS_BODY_HALF = 38;              // Boss 身体半宽（绘制 x-38 ~ x+38）
+      const PLAYER_ATTACK_REACH = 60;         // 玩家挥刀命中范围：刀从身体边缘向外延伸（长刀横扫）
+      const MOB_ATTACK_REACH = 18;            // 小怪近身攻击：身体边缘 + 手臂长度
+      const BOSS_ATTACK_REACH = 30;           // Boss 攻击：大刀挥砍范围
+      const MOB_ATTACK_WINDUP = 0.4;          // 小怪攻击前摇（抬手到出伤的时间，给玩家反应）
+      const BOSS_ATTACK_WINDUP = 0.55;        // Boss 攻击前摇
+      const MOB_ATTACK_COOLDOWN = 1.4;        // 小怪攻击冷却（出伤后到下次起手）
+      const BOSS_ATTACK_COOLDOWN = 1.2;       // Boss 攻击冷却
+      const PLAYER_JUMP_VELOCITY = 520;       // 跳跃初速度 px/s（向上）
+      const GRAVITY = 1600;                   // 重力加速度 px/s²
+      const JUMP_BONUS_DAMAGE = 5;            // 跳劈（空中攻击）额外伤害
+
+      // 判断两个「中心 x + 半宽」的碰撞盒是否重叠
+      function boxesOverlap(cx1, half1, cx2, half2) {
+        return Math.abs(cx1 - cx2) <= half1 + half2;
+      }
+      // 攻击区间命中：攻击者从身体中心向外延伸到武器尖端的一整段 [attackerX, attackerX + dir*(bodyHalf+reach)]
+      // 目标身体盒 [targetX-half, targetX+half] 与该区间重叠即命中（身体重合/贴脸/背后都能命中）
+      function attackRangeHits(attackerX, dir, bodyHalf, reach, targetX, targetHalf) {
+        const a = attackerX;
+        const b = attackerX + dir * (bodyHalf + reach);
+        const lo = Math.min(a, b);
+        const hi = Math.max(a, b);
+        return !(targetX + targetHalf < lo || targetX - targetHalf > hi);
+      }
+
+      function startScenario(id) {
+        const sc = SCENARIOS.find(s => s.id === id);
+        if (!sc) return;
+        battle = {
+          scenarioId: id,
+          stage: "mobs",                       // mobs → boss → (victory/defeat)
+          player: {
+            x: 160, y: BATTLE_GROUND, hp: 4000, maxHp: 4000,
+            level: 1, attack: 10, critRate: 0.10, critDamage: 50,
+            facing: 1, moveDir: 0, attackCooldown: 0, attacking: 0,
+            vy: 0, jumping: false
+          },
+          boss: { x: 800, y: BATTLE_GROUND, hp: 10000, maxHp: 10000, attackTimer: 0, attackCooldown: BOSS_ATTACK_COOLDOWN, hitCooldown: 0, attacking: 0, windup: 0, stun: 0 },
+          mobs: [],
+          mobsSpawned: 0, mobsKilled: 0,
+          particles: [], floaters: [],
+          elapsed: 0
+        };
+        // 预生成 50 只小怪（按需刷出，场上最多同时存在若干只）
+        for (let i = 0; i < MOB_COUNT; i++) battle.mobs.push(makeMob());
+        battle.mobs.forEach((m, i) => { m.active = false; m.spawnAt = i * 1.1 + 1; }); // 陆续出场
+        document.getElementById("battle-scenario").textContent = sc.name;
+        document.getElementById("battle-stage").textContent = "第一阶段 · 清剿小怪（0 / 50）";
+        document.getElementById("battle-overlay").classList.remove("show");
+        showView("battle-view");
+        updateBattleHud();
+        cancelAnimationFrame(battleAnimation);
+        battleLastFrame = performance.now();
+        battleAnimation = requestAnimationFrame(battleFrame);
+      }
+
+      function makeMob() {
+        const hp = 10 + Math.floor(Math.random() * 8);   // 杂兵 1~3 刀
+        return {
+          x: 800 + Math.random() * 140, y: BATTLE_GROUND, hp, maxHp: hp,
+          speed: 55 + Math.random() * 50, active: false, spawnAt: 0,
+          attackTimer: 0, attackCooldown: MOB_ATTACK_COOLDOWN + Math.random() * 0.4,
+          hitCooldown: 0, attacking: 0, windup: 0, stun: 0
+        };
+      }
+
+      function battleJump() {
+        if (!battle || battle.stage === "victory" || battle.stage === "defeat") return;
+        const p = battle.player;
+        if (p.jumping) return;               // 已在空中，不能二段跳
+        p.jumping = true;
+        p.vy = -PLAYER_JUMP_VELOCITY;        // 向上（canvas y 向上为负）
+      }
+
+      function battleAttack() {
+        if (!battle || battle.stage === "victory" || battle.stage === "defeat") return;
+        const p = battle.player;
+        if (p.attackCooldown > 0) return;
+        p.attackCooldown = 0.35;                 // 挥刀间隔
+        p.attacking = 0.18;                      // 挥刀动画时长
+        const isCrit = Math.random() < p.critRate;
+        // 跳劈（空中攻击）额外 +5 伤害
+        const jumpBonus = p.jumping ? JUMP_BONUS_DAMAGE : 0;
+        const dmg = (isCrit ? p.critDamage : p.attack) + jumpBonus;
+        // 命中判定：刀横扫范围 = 从主角身体中心向外到刀尖的一整段（含身体自身），
+        // 这样即使敌人与主角模型重合（重叠），也能命中，不会出现"大的打不到小的"。
+        // 攻击范围盒 = [p.x, p.x + facing*(BODY_HALF + REACH)]，敌人身体盒与之重叠即命中
+        const swingStart = p.x;
+        const swingEnd = p.x + p.facing * (PLAYER_BODY_HALF + PLAYER_ATTACK_REACH);
+        const lo = Math.min(swingStart, swingEnd);
+        const hi = Math.max(swingStart, swingEnd);
+        const hitBySwing = (objX, half) => !(objX + half < lo || objX - half > hi);
+        const reachable = [];
+        if (battle.stage === "boss" && battle.boss.hp > 0) {
+          if (hitBySwing(battle.boss.x, BOSS_BODY_HALF)) reachable.push({ kind: "boss", obj: battle.boss });
+        }
+        for (const m of battle.mobs) {
+          if (m.active && m.hp > 0 && hitBySwing(m.x, MOB_BODY_HALF)) reachable.push({ kind: "mob", obj: m });
+        }
+        if (!reachable.length) return;           // 空挥（刀没碰到任何敌人身体）
+        const hit = reachable.sort((a, b) => Math.abs(a.obj.x - p.x) - Math.abs(b.obj.x - p.x))[0];
+        hit.obj.hp -= dmg;
+        hit.obj.hitCooldown = 0.25;
+        // 暴击时给敌人施加僵直（0.3s 硬直，期间不能移动/攻击）
+        if (isCrit) hit.obj.stun = 0.3;
+        const label = `${isCrit ? "暴击 " : ""}${jumpBonus > 0 ? "跳劈 " : ""}-${dmg}`;
+        spawnFloater(hit.obj.x, hit.obj.y - 60, label, isCrit);
+        spawnSlash(p.x, hit.obj.x, isCrit);
+        if (hit.kind === "mob" && hit.obj.hp <= 0) killMob(hit.obj);
+        if (hit.kind === "boss" && battle.boss.hp <= 0) endBattle(true);
+        updateBattleHud();
+      }
+
+      function killMob(mob) {
+        mob.active = false;
+        battle.mobsKilled++;
+        const p = battle.player;
+        p.level++;
+        p.attack += 1;
+        p.critRate = Math.min(1, p.critRate + 0.001);
+        p.critDamage += 1;
+        spawnFloater(mob.x, mob.y - 70, "升级！", false, true);
+        if (battle.mobsKilled >= MOB_COUNT) {
+          battle.stage = "boss";
+          battle.boss.attackTimer = 1.2;        // Boss 出场给玩家反应时间
+          document.getElementById("battle-stage").textContent = "最终阶段 · 决战华雄";
+          showToast("小怪已清剿完毕，华雄登场！");
+        }
+      }
+
+      function battleBossAttack() {
+        if (battle.stage !== "boss" || battle.boss.hp <= 0) return;
+        const b = battle.boss;
+        b.attackTimer -= 0.02;                   // 由 frame 驱动，此处仅标记
+      }
+
+      function endBattle(win) {
+        battle.stage = win ? "victory" : "defeat";
+        cancelAnimationFrame(battleAnimation);
+        const tag = document.getElementById("battle-result-tag");
+        const title = document.getElementById("battle-result-title");
+        const detail = document.getElementById("battle-result-detail");
+        const stats = document.getElementById("battle-result-stats");
+        if (win) {
+          tag.textContent = "VICTORY";
+          title.textContent = "武圣显威！";
+          detail.textContent = "击败华雄，温酒未凉。";
+        } else {
+          tag.textContent = "DEFEAT";
+          title.textContent = "败走麦城…";
+          detail.textContent = "重整旗鼓，再战一回。";
+        }
+        stats.textContent = `击杀小怪 ${battle.mobsKilled} / ${MOB_COUNT}  ·  等级 Lv.${battle.player.level}`;
+        document.getElementById("battle-overlay").classList.add("show");
+      }
+
+      function updateBattleHud() {
+        if (!battle) return;
+        const p = battle.player;
+        const pct = (v, m) => Math.max(0, Math.min(100, (v / m) * 100));
+        const playerBar = document.getElementById("battle-player-hp");
+        playerBar.style.width = pct(p.hp, p.maxHp) + "%";
+        document.getElementById("battle-player-hp-text").textContent = `${Math.max(0, Math.ceil(p.hp))} / ${p.maxHp}`;
+        const bossBar = document.getElementById("battle-boss-hp");
+        bossBar.style.width = pct(battle.boss.hp, battle.boss.maxHp) + "%";
+        document.getElementById("battle-boss-hp-text").textContent = `${Math.max(0, Math.ceil(battle.boss.hp))} / ${battle.boss.maxHp}`;
+        document.getElementById("battle-level").textContent = `Lv.${p.level}`;
+        document.getElementById("battle-kills").textContent = `${battle.mobsKilled} / ${MOB_COUNT}`;
+        document.getElementById("battle-atk").textContent = p.attack;
+        document.getElementById("battle-crit").textContent = `${(p.critRate * 100).toFixed(1)}%`;
+        document.getElementById("battle-critdmg").textContent = p.critDamage;
+      }
+
+      function spawnFloater(x, y, text, crit, levelUp) {
+        battle.floaters.push({ x, y, text, crit, levelUp, life: 0.9 });
+      }
+      function spawnSlash(fromX, toX, crit) {
+        battle.particles.push({ x: fromX, y: battle.player.y - 50, targetX: toX, life: 0.16, crit, kind: "slash" });
+      }
+      function spawnHitSpark(x, y) {
+        for (let i = 0; i < 8; i++) battle.particles.push({ x, y, vx: (Math.random() - .5) * 180, vy: -Math.random() * 140, life: .4, color: "#fff0aa", kind: "spark" });
+      }
+
+      function battleFrame(now) {
+        if (!battle) return;
+        if (battle.stage === "victory" || battle.stage === "defeat") return;
+        const dt = Math.min((now - battleLastFrame) / 1000, .05);
+        battleLastFrame = now;
+        battle.elapsed += dt;
+        updateBattle(dt);
+        drawBattle();
+        updateBattleHud();
+        battleAnimation = requestAnimationFrame(battleFrame);
+      }
+
+      function updateBattle(dt) {
+        const p = battle.player;
+        // 玩家移动：挥刀时仍可移动
+        p.x += p.moveDir * MOVE_SPEED * dt;
+        p.x = Math.max(40, Math.min(canvas.width - 40, p.x));
+        // 跳跃物理：空中受重力，落地回地面
+        if (p.jumping) {
+          p.vy += GRAVITY * dt;           // 重力
+          p.y += p.vy * dt;               // 垂直位移（注意 canvas y 向下为正，向上为负）
+          if (p.y >= BATTLE_GROUND) {     // 落地
+            p.y = BATTLE_GROUND;
+            p.vy = 0;
+            p.jumping = false;
+          }
+        }
+        if (p.attackCooldown > 0) p.attackCooldown -= dt;
+        if (p.attacking > 0) p.attacking -= dt;
+
+        // 小怪：陆续激活 + 移动 + 攻击（主角可自由穿过敌人，无硬碰撞阻挡）
+        for (const m of battle.mobs) {
+          if (!m.active) {
+            if (battle.elapsed >= m.spawnAt) { m.active = true; m.x = 820 + Math.random() * 100; }
+            else continue;
+          }
+          if (m.hp <= 0) continue;
+          const dir = p.x > m.x ? 1 : -1;
+          // 僵直倒计时
+          if (m.stun > 0) m.stun -= dt;
+          const stunned = m.stun > 0;
+          // 小怪朝玩家靠近（僵直期间不能移动）
+          if (!stunned) m.x += dir * m.speed * dt;
+          if (m.attacking > 0) m.attacking -= dt;
+          m.attackTimer -= dt;
+          if (m.hitCooldown > 0) m.hitCooldown -= dt;
+          // 僵直期间不能攻击（打断前摇与出招）
+          if (stunned) continue;
+          // 小怪近身攻击：先起手前摇（windup），前摇结束才扣血
+          // 攻击区间 = 从身体中心向外延伸到手臂尖端，身体重合/贴脸也能命中
+          const mobInRange = attackRangeHits(m.x, dir, MOB_BODY_HALF, MOB_ATTACK_REACH, p.x, PLAYER_BODY_HALF);
+          if (m.windup > 0) {
+            // 前摇进行中，倒计时
+            m.windup -= dt;
+            if (m.windup <= 0) {
+              // 前摇结束：结算伤害（仍须在范围内）
+              m.windup = 0;
+              if (attackRangeHits(m.x, dir, MOB_BODY_HALF, MOB_ATTACK_REACH, p.x, PLAYER_BODY_HALF)) {
+                m.attackTimer = m.attackCooldown;
+                p.hp -= 15;
+                spawnFloater(p.x, p.y - 60, "-15", false);
+                spawnHitSpark(p.x, p.y - 40);
+                if (p.hp <= 0) { p.hp = 0; endBattle(false); return; }
+              }
+            }
+          } else if (mobInRange && m.attackTimer <= 0) {
+            // 进入范围且冷却结束 → 起手前摇，暂不扣血
+            m.windup = MOB_ATTACK_WINDUP;
+            m.attacking = MOB_ATTACK_WINDUP;    // 前摇动画
+          }
+        }
+
+        // Boss 攻击
+        if (battle.stage === "boss" && battle.boss.hp > 0) {
+          const b = battle.boss;
+          // 僵直倒计时
+          if (b.stun > 0) b.stun -= dt;
+          const bStunned = b.stun > 0;
+          b.attackTimer -= dt;
+          if (b.hitCooldown > 0) b.hitCooldown -= dt;
+          if (b.attacking > 0) b.attacking -= dt;
+          // Boss 缓慢靠近玩家（僵直期间不能移动）；持续追击直到贴近，避免"卡在远处打不到"
+          const dir = p.x > b.x ? 1 : -1;
+          if (!bStunned && Math.abs(b.x - p.x) > BOSS_BODY_HALF + PLAYER_BODY_HALF + 20) b.x += dir * 70 * dt;
+          // 僵直期间不能攻击（打断前摇与出招）；否则正常起手/出招
+          if (!bStunned) {
+            // Boss 攻击：先起手前摇（windup），前摇结束才扣血
+            // 攻击区间 = 从身体中心向外延伸到大刀尖端，身体重合/贴脸也能命中
+            if (b.windup > 0) {
+              b.windup -= dt;
+              if (b.windup <= 0) {
+                b.windup = 0;
+                if (attackRangeHits(b.x, dir, BOSS_BODY_HALF, BOSS_ATTACK_REACH, p.x, PLAYER_BODY_HALF)) {
+                  b.attackTimer = b.attackCooldown;
+                  p.hp -= 20;
+                  spawnFloater(p.x, p.y - 60, "-20", false);
+                  spawnHitSpark(p.x, p.y - 40);
+                  if (p.hp <= 0) { p.hp = 0; endBattle(false); return; }
+                }
+              }
+            } else if (attackRangeHits(b.x, dir, BOSS_BODY_HALF, BOSS_ATTACK_REACH, p.x, PLAYER_BODY_HALF) && b.attackTimer <= 0) {
+              b.windup = BOSS_ATTACK_WINDUP;
+              b.attacking = BOSS_ATTACK_WINDUP;   // Boss 攻击前摇动画
+            }
+          }
+        }
+
+        // 粒子与飘字更新
+        for (const pt of battle.particles) { if (pt.kind === "spark") { pt.x += pt.vx * dt; pt.y += pt.vy * dt; pt.vy += 300 * dt; } pt.life -= dt; }
+        battle.particles = battle.particles.filter(pt => pt.life > 0);
+        for (const f of battle.floaters) { f.y -= 26 * dt; f.life -= dt; }
+        battle.floaters = battle.floaters.filter(f => f.life > 0);
+      }
+
+      function drawBattle() {
+        const w = battleCanvas.width, h = battleCanvas.height;
+        battleContext.clearRect(0, 0, w, h);
+        // —— 汜水关 · 黄昏战场 ——
+        const sky = battleContext.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0, "#e8a86a"); sky.addColorStop(.5, "#edc994"); sky.addColorStop(1, "#d9a269");
+        battleContext.fillStyle = sky; battleContext.fillRect(0, 0, w, h);
+        // 落日
+        battleContext.fillStyle = "rgba(255,176,110,.75)";
+        battleContext.beginPath(); battleContext.arc(700, 105, 46, 0, Math.PI * 2); battleContext.fill();
+        battleContext.fillStyle = "rgba(255,210,140,.4)";
+        battleContext.beginPath(); battleContext.arc(700, 105, 62, 0, Math.PI * 2); battleContext.fill();
+        // 远山层叠
+        battleContext.fillStyle = "#a97e58";
+        battleContext.beginPath(); battleContext.moveTo(0, BATTLE_GROUND); battleContext.lineTo(120, 235); battleContext.lineTo(290, BATTLE_GROUND); battleContext.lineTo(455, 248); battleContext.lineTo(640, BATTLE_GROUND); battleContext.lineTo(815, 238); battleContext.lineTo(960, BATTLE_GROUND); battleContext.fill();
+        battleContext.fillStyle = "#8a6746";
+        battleContext.beginPath(); battleContext.moveTo(0, 292); battleContext.lineTo(180, 268); battleContext.lineTo(360, 296); battleContext.lineTo(560, 270); battleContext.lineTo(760, 292); battleContext.lineTo(960, 274); battleContext.lineTo(960, BATTLE_GROUND); battleContext.lineTo(0, BATTLE_GROUND); battleContext.fill();
+
+        // —— 汜水关城楼（远景关隘，右侧）——
+        drawGateTower(720, BATTLE_GROUND);
+
+        // —— 战场地面 ——
+        battleContext.fillStyle = "#6b4f35"; battleContext.fillRect(0, BATTLE_GROUND, w, h - BATTLE_GROUND);
+        battleContext.fillStyle = "#59422b"; battleContext.fillRect(0, BATTLE_GROUND, w, 6);
+        // 地面车辙/裂纹纹理
+        battleContext.strokeStyle = "rgba(24,37,30,.25)"; battleContext.lineWidth = 1;
+        for (let i = 0; i < 12; i++) {
+          const gx = (i * 173) % w;
+          battleContext.beginPath(); battleContext.moveTo(gx, BATTLE_GROUND + 14); battleContext.lineTo(gx + 26, BATTLE_GROUND + 30); battleContext.stroke();
+        }
+        // 散落的断箭与碎石
+        battleContext.fillStyle = "rgba(24,37,30,.4)";
+        for (let i = 0; i < 10; i++) {
+          const ax = (i * 211 + 40) % w, ay = BATTLE_GROUND + 18 + (i % 4) * 8;
+          battleContext.save(); battleContext.translate(ax, ay); battleContext.rotate(i * 1.3);
+          battleContext.fillRect(-8, -1, 16, 2); battleContext.fillRect(-8, -1, 3, 4); battleContext.restore();
+        }
+
+        const p = battle.player;
+        // 攻击范围圈（反映真实挥刀命中范围：身体 + 刀延伸）
+        const attackReachRadius = PLAYER_BODY_HALF + PLAYER_ATTACK_REACH;
+        battleContext.strokeStyle = "rgba(215,243,106,.22)"; battleContext.lineWidth = 1;
+        battleContext.setLineDash([6, 6]);
+        battleContext.beginPath(); battleContext.arc(p.x, p.y - 40, attackReachRadius, 0, Math.PI * 2); battleContext.stroke();
+        battleContext.setLineDash([]);
+
+        // 小怪
+        for (const m of battle.mobs) if (m.active && m.hp > 0) drawMob(m);
+        // Boss
+        if (battle.stage === "boss" && battle.boss.hp > 0) drawBoss(battle.boss);
+        // 玩家（关羽）
+        drawGuanyu(p);
+
+        // —— 受击框调试可视化（hitbox debug）——
+        drawHitboxes();
+
+        // 粒子
+        for (const pt of battle.particles) {
+          if (pt.kind === "spark") { battleContext.globalAlpha = Math.max(0, pt.life / .4); battleContext.fillStyle = pt.color; battleContext.fillRect(pt.x - 2, pt.y - 2, 4, 4); }
+          else if (pt.kind === "slash") { battleContext.globalAlpha = Math.max(0, pt.life / .16); battleContext.strokeStyle = pt.crit ? "#ff7862" : "#fff0aa"; battleContext.lineWidth = 3; battleContext.beginPath(); battleContext.moveTo(pt.x, pt.y); battleContext.lineTo(pt.targetX, pt.y - 20); battleContext.stroke(); }
+        }
+        battleContext.globalAlpha = 1;
+
+        // 飘字
+        for (const f of battle.floaters) {
+          battleContext.globalAlpha = Math.max(0, f.life / .9);
+          battleContext.fillStyle = f.levelUp ? "#d7f36a" : f.crit ? "#ff7862" : "#fff0aa";
+          battleContext.font = f.levelUp ? "700 18px 'DM Mono', monospace" : "700 15px 'DM Mono', monospace";
+          battleContext.textAlign = "center";
+          battleContext.fillText(f.text, f.x, f.y);
+        }
+        battleContext.textAlign = "left";
+        battleContext.globalAlpha = 1;
+      }
+
+      // 绘制汜水关城楼（关隘背景）
+      function drawGateTower(gx, ground) {
+        battleContext.save();
+        // 城墙（土黄色夯土墙）
+        battleContext.fillStyle = "#b8925c";
+        battleContext.fillRect(gx - 90, ground - 150, 180, 150);
+        battleContext.strokeStyle = "#7a5c38"; battleContext.lineWidth = 2;
+        battleContext.strokeRect(gx - 90, ground - 150, 180, 150);
+        // 城砖纹理
+        battleContext.strokeStyle = "rgba(122,92,56,.6)"; battleContext.lineWidth = 1;
+        for (let r = 0; r < 4; r++) { battleContext.beginPath(); battleContext.moveTo(gx - 90, ground - 120 + r * 30); battleContext.lineTo(gx + 90, ground - 120 + r * 30); battleContext.stroke(); }
+        for (let c = 0; c < 5; c++) { battleContext.beginPath(); battleContext.moveTo(gx - 90 + c * 36, ground - 150); battleContext.lineTo(gx - 90 + c * 36, ground); battleContext.stroke(); }
+        // 城楼（木构敌楼）
+        battleContext.fillStyle = "#7a4a2e";
+        battleContext.fillRect(gx - 60, ground - 196, 120, 46);
+        battleContext.strokeStyle = "#4a2f1d"; battleContext.lineWidth = 2;
+        battleContext.strokeRect(gx - 60, ground - 196, 120, 46);
+        // 楼顶（庑殿顶）
+        battleContext.fillStyle = "#3f5a3a";
+        battleContext.beginPath(); battleContext.moveTo(gx - 72, ground - 196); battleContext.lineTo(gx, ground - 238); battleContext.lineTo(gx + 72, ground - 196); battleContext.closePath(); battleContext.fill();
+        battleContext.strokeStyle = "#2f4630"; battleContext.stroke();
+        // 城门洞
+        battleContext.fillStyle = "#3a2a1a";
+        battleContext.beginPath(); battleContext.moveTo(gx - 28, ground); battleContext.lineTo(gx - 28, ground - 60); battleContext.arc(gx, ground - 60, 28, Math.PI, 0); battleContext.lineTo(gx + 28, ground); battleContext.closePath(); battleContext.fill();
+        // 城楼上的旌旗
+        drawBanner(gx - 40, ground - 238, "#c0392b");
+        drawBanner(gx + 40, ground - 238, "#c0392b");
+        battleContext.restore();
+      }
+      function drawBanner(bx, by, color) {
+        battleContext.save();
+        battleContext.strokeStyle = "#4a2f1d"; battleContext.lineWidth = 3;
+        battleContext.beginPath(); battleContext.moveTo(bx, by); battleContext.lineTo(bx, by - 34); battleContext.stroke();
+        battleContext.fillStyle = color;
+        battleContext.beginPath();
+        battleContext.moveTo(bx, by - 34);
+        battleContext.quadraticCurveTo(bx + 22, by - 30, bx + 34, by - 24);
+        battleContext.lineTo(bx, by - 20);
+        battleContext.closePath(); battleContext.fill();
+        battleContext.strokeStyle = "#8a2a20"; battleContext.lineWidth = 1;
+        battleContext.beginPath(); battleContext.moveTo(bx, by - 34); battleContext.quadraticCurveTo(bx + 22, by - 30, bx + 34, by - 24); battleContext.stroke();
+        battleContext.restore();
+      }
+
+      function drawGuanyu(p) {
+        const x = p.x, feet = p.y;
+        battleContext.save();
+        battleContext.lineJoin = "round"; battleContext.lineCap = "round"; battleContext.lineWidth = 2.5;
+        // 挥刀动画：身体前倾、刀劈下
+        const swing = p.attacking > 0 ? Math.sin((0.18 - p.attacking) / 0.18 * Math.PI) : 0;
+        const fx = p.facing;
+        const idleBob = Math.sin(battle.elapsed * 6) * 1.5;   // 呼吸起伏
+
+        // —— 脚下影子 ——
+        battleContext.fillStyle = "rgba(24,37,30,.25)";
+        battleContext.beginPath(); battleContext.ellipse(x, feet + 4, 24, 6, 0, 0, Math.PI * 2); battleContext.fill();
+
+        // —— 绿袍下摆（随风摆动的袍角）——
+        const robeSway = Math.sin(battle.elapsed * 5) * 3;
+        battleContext.fillStyle = "#2e6b41";
+        battleContext.beginPath();
+        battleContext.moveTo(x - 17, feet - 58);
+        battleContext.quadraticCurveTo(x - 24, feet - 20 + robeSway, x - 20, feet - 2);
+        battleContext.lineTo(x + 16, feet - 2);
+        battleContext.quadraticCurveTo(x + 22, feet - 22 + robeSway, x + 17, feet - 58);
+        battleContext.closePath(); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+
+        // —— 铠甲上身（绿甲 + 护心镜 + 鳞甲纹）——
+        battleContext.fillStyle = "#3a8050";
+        battleContext.beginPath(); battleContext.roundRect(x - 16, feet - 62, 32, 24, 7); battleContext.fill(); battleContext.stroke();
+        // 肩甲
+        battleContext.fillStyle = "#2e6b41";
+        battleContext.beginPath(); battleContext.roundRect(x - 18, feet - 63, 7, 14, 3); battleContext.fill(); battleContext.stroke();
+        battleContext.beginPath(); battleContext.roundRect(x + 11, feet - 63, 7, 14, 3); battleContext.fill(); battleContext.stroke();
+        // 鳞甲纹（胸前甲片）
+        battleContext.strokeStyle = "rgba(0,0,0,.18)"; battleContext.lineWidth = 1;
+        for (let ry = feet - 58; ry < feet - 42; ry += 6) {
+          battleContext.beginPath();
+          battleContext.moveTo(x - 14, ry); battleContext.lineTo(x + 14, ry);
+          battleContext.stroke();
+        }
+        battleContext.lineWidth = 2.5;
+        // 护心镜（铜镜，带高光）
+        battleContext.fillStyle = "#c9a23a";
+        battleContext.beginPath(); battleContext.arc(x, feet - 50, 5.5, 0, Math.PI * 2); battleContext.fill();
+        battleContext.strokeStyle = "#7a5a1a"; battleContext.beginPath(); battleContext.arc(x, feet - 50, 5.5, 0, Math.PI * 2); battleContext.stroke();
+        battleContext.fillStyle = "#f0e0a0";
+        battleContext.beginPath(); battleContext.arc(x - 2, feet - 52, 1.8, 0, Math.PI * 2); battleContext.fill();  // 高光
+
+        // —— 枣红脸（面如重枣）——
+        battleContext.fillStyle = "#c0392b";
+        battleContext.beginPath(); battleContext.ellipse(x + fx * 2, feet - 74 + idleBob * .3, 13, 15, 0, 0, Math.PI * 2); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 脸侧暗部（增加立体感）
+        battleContext.fillStyle = "rgba(0,0,0,.12)";
+        battleContext.beginPath(); battleContext.ellipse(x + fx * 2 + 4, feet - 74 + idleBob * .3, 8, 14, 0, 0, Math.PI * 2); battleContext.fill();
+
+        // —— 丹凤眼（细长上挑，眼角微勾）——
+        battleContext.strokeStyle = "#18251e"; battleContext.lineWidth = 2;
+        const eyeX = x + fx * 3, eyeY = feet - 76 + idleBob * .3;
+        battleContext.beginPath();
+        battleContext.moveTo(eyeX - 5, eyeY);
+        battleContext.quadraticCurveTo(eyeX, eyeY - 2, eyeX + 5, eyeY + 1);
+        battleContext.stroke();
+        // 眼珠
+        battleContext.fillStyle = "#18251e";
+        battleContext.beginPath(); battleContext.arc(eyeX + 1, eyeY + .5, 1.4, 0, Math.PI * 2); battleContext.fill();
+
+        // —— 卧蚕眉（粗厚，眉尾上挑）——
+        battleContext.strokeStyle = "#18251e"; battleContext.lineWidth = 3;
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2 - 6, feet - 81 + idleBob * .3);
+        battleContext.quadraticCurveTo(x + fx * 2, feet - 84 + idleBob * .3, x + fx * 2 + 7, feet - 80 + idleBob * .3);
+        battleContext.stroke();
+        battleContext.lineWidth = 2.5;
+
+        // —— 青巾幞头（绿头巾 + 垂带）——
+        battleContext.fillStyle = "#18251e";
+        battleContext.beginPath(); battleContext.arc(x + fx * 2, feet - 82 + idleBob * .3, 13, Math.PI, 0); battleContext.fill();
+        battleContext.fillRect(x + fx * 2 - 13, feet - 85 + idleBob * .3, 26, 5);
+        battleContext.fillStyle = "#2e6b41";
+        battleContext.fillRect(x + fx * 2 - 13, feet - 84 + idleBob * .3, 26, 3);  // 绿巾主体
+        // 头巾垂带（两根，随风摆）
+        battleContext.fillStyle = "#2e6b41";
+        battleContext.fillRect(x + fx * 2 - 10, feet - 80 + idleBob * .3, 4, 18 + robeSway * .5);
+        battleContext.fillRect(x + fx * 2 + 6, feet - 80 + idleBob * .3, 4, 16 + robeSway * .4);
+
+        // —— 五绺长髯（美须髯，垂及胸腹，随风飘动）——
+        battleContext.strokeStyle = "#18251e"; battleContext.lineWidth = 3;
+        // 中央主髯（最长，垂至腰腹）
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2, feet - 66);
+        battleContext.quadraticCurveTo(x + fx * 2 - 2, feet - 40 + robeSway * .7, x + fx * 2 - 6, feet - 18 + robeSway);
+        battleContext.stroke();
+        // 左侧两绺
+        battleContext.lineWidth = 2.5;
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2 - 5, feet - 64);
+        battleContext.quadraticCurveTo(x + fx * 2 - 9, feet - 42 + robeSway * .6, x + fx * 2 - 13, feet - 26 + robeSway * .8);
+        battleContext.stroke();
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2 - 3, feet - 65);
+        battleContext.quadraticCurveTo(x + fx * 2 - 7, feet - 46 + robeSway * .5, x + fx * 2 - 10, feet - 32 + robeSway * .6);
+        battleContext.stroke();
+        // 右侧两绺
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2 + 5, feet - 64);
+        battleContext.quadraticCurveTo(x + fx * 2 + 9, feet - 42 + robeSway * .6, x + fx * 2 + 13, feet - 26 + robeSway * .8);
+        battleContext.stroke();
+        battleContext.beginPath();
+        battleContext.moveTo(x + fx * 2 + 3, feet - 65);
+        battleContext.quadraticCurveTo(x + fx * 2 + 7, feet - 46 + robeSway * .5, x + fx * 2 + 10, feet - 32 + robeSway * .6);
+        battleContext.stroke();
+        battleContext.lineWidth = 2.5;
+
+        // —— 青龙偃月刀（直刃长柄刀 + 回钩，带青龙纹）——
+        battleContext.save();
+        battleContext.translate(x + 6 * fx, feet - 56);
+        battleContext.rotate(fx * (0.6 - swing * 1.4));
+        // 刀柄（长杆，笔直）
+        battleContext.strokeStyle = "#5c3a21"; battleContext.lineWidth = 5;
+        battleContext.beginPath(); battleContext.moveTo(0, 0); battleContext.lineTo(14 * fx, -42); battleContext.stroke();
+        battleContext.strokeStyle = "#8a5a32"; battleContext.lineWidth = 3;
+        battleContext.beginPath(); battleContext.moveTo(14 * fx, -42); battleContext.lineTo(30 * fx, -80); battleContext.stroke();
+        // 刀杆与刀头的连接处（吞口/龙口）
+        battleContext.fillStyle = "#8a5a32";
+        battleContext.beginPath(); battleContext.arc(30 * fx, -78, 4, 0, Math.PI * 2); battleContext.fill();
+        // 直刀身（青龙偃月刀：直刃，长条形刀身）
+        battleContext.fillStyle = "#e8e8e0";
+        battleContext.strokeStyle = "#8a5a32"; battleContext.lineWidth = 2;
+        battleContext.beginPath();
+        battleContext.moveTo(30 * fx, -80);           // 刀根（吞口上方）
+        battleContext.lineTo(38 * fx, -98);           // 刀尖上端（直）
+        battleContext.lineTo(44 * fx, -92);           // 刀尖前端
+        battleContext.lineTo(35 * fx, -78);           // 刀刃下缘
+        battleContext.closePath(); battleContext.fill(); battleContext.stroke();
+        // 刀头尖端回钩（钩尖似枪，向下勾）
+        battleContext.beginPath();
+        battleContext.moveTo(38 * fx, -98);
+        battleContext.quadraticCurveTo(44 * fx, -100, 46 * fx, -94);
+        battleContext.lineTo(41 * fx, -92);
+        battleContext.closePath(); battleContext.fill(); battleContext.stroke();
+        // 刀背锯齿（冷艳锯，刀背一排小刺）
+        battleContext.fillStyle = "#c9c9c0";
+        battleContext.beginPath();
+        battleContext.moveTo(31 * fx, -84);
+        battleContext.lineTo(33 * fx, -86); battleContext.lineTo(32 * fx, -88);
+        battleContext.lineTo(34 * fx, -90); battleContext.lineTo(33 * fx, -92);
+        battleContext.closePath(); battleContext.fill();
+        // 蟠龙纹（刀身浮雕，吞月青龙，沿直刀身纵向）
+        battleContext.strokeStyle = "rgba(138,90,50,.55)"; battleContext.lineWidth = 1.2;
+        battleContext.beginPath();
+        battleContext.moveTo(32 * fx, -80);
+        battleContext.quadraticCurveTo(35 * fx, -84, 36 * fx, -90);
+        battleContext.quadraticCurveTo(37 * fx, -95, 34 * fx, -98);
+        battleContext.stroke();
+        // 刀身反光（直刀身的纵向高光）
+        battleContext.fillStyle = "#fff"; battleContext.globalAlpha = .5;
+        battleContext.beginPath(); battleContext.moveTo(33 * fx, -82); battleContext.lineTo(36 * fx, -94); battleContext.lineTo(37 * fx, -90); battleContext.lineTo(34 * fx, -80); battleContext.closePath(); battleContext.fill();
+        battleContext.globalAlpha = 1;
+        battleContext.restore();
+
+        // —— 腿与战靴 ——
+        battleContext.fillStyle = "#253b30";
+        battleContext.fillRect(x - 13, feet - 14, 11, 14); battleContext.fillRect(x + 2, feet - 14, 11, 14);
+        battleContext.fillStyle = "#18251e";
+        battleContext.fillRect(x - 14, feet - 4, 13, 4); battleContext.fillRect(x + 1, feet - 4, 13, 4);
+        battleContext.restore();
+      }
+
+      function drawHitboxes() {
+        if (!battle) return;
+        const p = battle.player;
+        const gy = BATTLE_GROUND;
+        const py = p.y;   // 玩家当前 y（跳跃时上升，受击框跟随）
+
+        // 玩家受击框（绿色）：身体碰撞盒，跟随玩家跳跃高度
+        battleContext.save();
+        battleContext.strokeStyle = "rgba(80,255,120,.9)"; battleContext.lineWidth = 2;
+        battleContext.setLineDash([]);
+        battleContext.strokeRect(p.x - PLAYER_BODY_HALF, py - 80, PLAYER_BODY_HALF * 2, 76);
+        // 玩家攻击范围（黄色虚线框）：横扫范围 [身体中心, 刀尖]，跟随玩家跳跃高度
+        const swLo = Math.min(p.x, p.x + p.facing * (PLAYER_BODY_HALF + PLAYER_ATTACK_REACH));
+        const swHi = Math.max(p.x, p.x + p.facing * (PLAYER_BODY_HALF + PLAYER_ATTACK_REACH));
+        battleContext.strokeStyle = "rgba(255,235,80,.75)"; battleContext.setLineDash([4, 4]);
+        battleContext.strokeRect(swLo, py - 70, swHi - swLo, 60);
+
+        // 小怪受击框（红色）：身体碰撞盒
+        battleContext.strokeStyle = "rgba(255,90,90,.9)"; battleContext.setLineDash([]);
+        for (const m of battle.mobs) {
+          if (!m.active || m.hp <= 0) continue;
+          battleContext.strokeRect(m.x - MOB_BODY_HALF, gy - 45, MOB_BODY_HALF * 2, 42);
+          // 小怪攻击框（橙色虚线）：攻击区间 [身体中心 → 手臂尖端]
+          const dir = p.x > m.x ? 1 : -1;
+          const mLo = Math.min(m.x, m.x + dir * (MOB_BODY_HALF + MOB_ATTACK_REACH));
+          const mHi = Math.max(m.x, m.x + dir * (MOB_BODY_HALF + MOB_ATTACK_REACH));
+          battleContext.strokeStyle = "rgba(255,160,60,.8)"; battleContext.setLineDash([3, 3]);
+          battleContext.strokeRect(mLo, gy - 50, mHi - mLo, 48);
+          battleContext.strokeStyle = "rgba(255,90,90,.9)"; battleContext.setLineDash([]);
+        }
+
+        // Boss 受击框（紫色）+ 攻击框（粉色虚线）
+        if (battle.stage === "boss" && battle.boss.hp > 0) {
+          const b = battle.boss;
+          battleContext.strokeStyle = "rgba(200,120,255,.9)";
+          battleContext.strokeRect(b.x - BOSS_BODY_HALF, gy - 90, BOSS_BODY_HALF * 2, 86);
+          const dir = p.x > b.x ? 1 : -1;
+          const bLo = Math.min(b.x, b.x + dir * (BOSS_BODY_HALF + BOSS_ATTACK_REACH));
+          const bHi = Math.max(b.x, b.x + dir * (BOSS_BODY_HALF + BOSS_ATTACK_REACH));
+          battleContext.strokeStyle = "rgba(255,120,200,.8)"; battleContext.setLineDash([3, 3]);
+          battleContext.strokeRect(bLo, gy - 60, bHi - bLo, 56);
+        }
+        battleContext.restore();
+      }
+
+      function drawMob(m) {
+        const x = m.x, feet = m.y;
+        battleContext.save(); battleContext.lineJoin = "round"; battleContext.lineCap = "round"; battleContext.lineWidth = 2;
+        const walk = Math.sin(battle.elapsed * 8 + m.x) * 2;
+        const fx = battle.player.x > m.x ? 1 : -1;  // 面向玩家
+
+        // 影子
+        battleContext.fillStyle = "rgba(24,37,30,.22)";
+        battleContext.beginPath(); battleContext.ellipse(x, feet + 3, 14, 4, 0, 0, Math.PI * 2); battleContext.fill();
+
+        // 士卒身体（布衣 + 皮甲）
+        battleContext.fillStyle = "#7a6a4a";
+        battleContext.beginPath(); battleContext.roundRect(x - 12, feet - 34, 24, 34, 6); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 皮甲胸甲
+        battleContext.fillStyle = "#8f6a3f";
+        battleContext.fillRect(x - 10, feet - 30, 20, 12);
+        battleContext.strokeStyle = "#18251e"; battleContext.fillRect(x - 10, feet - 30, 20, 12);
+        // 头（包着布巾）
+        battleContext.fillStyle = "#c98d5f";
+        battleContext.beginPath(); battleContext.arc(x + fx * 1, feet - 42, 10, 0, Math.PI * 2); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 布巾
+        battleContext.fillStyle = "#5c4a2f";
+        battleContext.beginPath(); battleContext.arc(x + fx * 1, feet - 43, 10, Math.PI, 0); battleContext.fill();
+        // 眼睛
+        battleContext.fillStyle = "#18251e";
+        battleContext.fillRect(x + fx * 3, feet - 44, 2, 2);
+
+        // 短刀（攻击时带挥砍动画：0.25s 内从高举劈下）
+        battleContext.save();
+        battleContext.translate(x - 6 * fx, feet - 30);
+        let swing = 0;
+        if (m.attacking > 0) swing = Math.sin((0.25 - m.attacking) / 0.25 * Math.PI);
+        battleContext.rotate(fx * (0.4 + walk * .04 - swing * 0.9));
+        battleContext.strokeStyle = "#5c3a21"; battleContext.lineWidth = 3;
+        battleContext.beginPath(); battleContext.moveTo(0, 0); battleContext.lineTo(10 * fx, -14); battleContext.stroke();
+        battleContext.fillStyle = "#e8e8e0";
+        battleContext.beginPath(); battleContext.moveTo(10 * fx, -14); battleContext.lineTo(16 * fx, -10); battleContext.lineTo(11 * fx, -5); battleContext.closePath(); battleContext.fill();
+        battleContext.restore();
+
+        // 腿
+        battleContext.fillStyle = "#5c4a2f";
+        battleContext.fillRect(x - 9, feet - 10 + walk, 8, 10); battleContext.fillRect(x + 1, feet - 10 - walk, 8, 10);
+
+        // 血条
+        const pct = Math.max(0, m.hp / m.maxHp);
+        battleContext.fillStyle = "rgba(24,37,30,.6)"; battleContext.fillRect(x - 16, feet - 62, 32, 4);
+        battleContext.fillStyle = "#ff7862"; battleContext.fillRect(x - 16, feet - 62, 32 * pct, 4);
+        battleContext.restore();
+      }
+
+      function drawBoss(b) {
+        const x = b.x, feet = b.y;
+        battleContext.save(); battleContext.lineJoin = "round"; battleContext.lineCap = "round"; battleContext.lineWidth = 3;
+        const fx = battle.player.x > b.x ? 1 : -1;  // 面向玩家
+        const idleBob = Math.sin(battle.elapsed * 4) * 2;
+
+        // 大影子
+        battleContext.fillStyle = "rgba(24,37,30,.3)";
+        battleContext.beginPath(); battleContext.ellipse(x, feet + 5, 40, 8, 0, 0, Math.PI * 2); battleContext.fill();
+
+        // —— 重甲身躯（魁梧，宽大）——
+        battleContext.fillStyle = "#4a2f1d";
+        battleContext.beginPath(); battleContext.roundRect(x - 38, feet - 96, 76, 96, 14); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 铠甲甲片纹理
+        battleContext.strokeStyle = "rgba(24,37,30,.5)"; battleContext.lineWidth = 1.5;
+        for (let i = 0; i < 4; i++) {
+          const yy = feet - 86 + i * 18;
+          battleContext.beginPath(); battleContext.moveTo(x - 34, yy); battleContext.lineTo(x + 34, yy); battleContext.stroke();
+        }
+        // 护心镜
+        battleContext.fillStyle = "#d7b45a"; battleContext.beginPath(); battleContext.arc(x, feet - 68, 11, 0, Math.PI * 2); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.beginPath(); battleContext.arc(x, feet - 68, 11, 0, Math.PI * 2); battleContext.stroke();
+
+        // —— 铁盔头 ——
+        battleContext.fillStyle = "#8f4a3c";
+        battleContext.beginPath(); battleContext.arc(x + fx * 2, feet - 112 + idleBob, 20, 0, Math.PI * 2); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 铁盔
+        battleContext.fillStyle = "#2a2a2a";
+        battleContext.beginPath(); battleContext.arc(x + fx * 2, feet - 114 + idleBob, 22, Math.PI, 0); battleContext.fill();
+        battleContext.strokeStyle = "#18251e"; battleContext.stroke();
+        // 盔顶红缨
+        battleContext.fillStyle = "#c0392b";
+        battleContext.beginPath(); battleContext.moveTo(x + fx * 2 - 3, feet - 130 + idleBob); battleContext.lineTo(x + fx * 2, feet - 140 + idleBob); battleContext.lineTo(x + fx * 2 + 3, feet - 130 + idleBob); battleContext.closePath(); battleContext.fill();
+        // 怒目
+        battleContext.fillStyle = "#f0eddf";
+        battleContext.fillRect(x + fx * 2 + 2, feet - 116 + idleBob, 4, 4); battleContext.fillRect(x + fx * 2 - 10, feet - 116 + idleBob, 4, 4);
+        battleContext.fillStyle = "#18251e";
+        battleContext.fillRect(x + fx * 2 + 3, feet - 115 + idleBob, 2, 2); battleContext.fillRect(x + fx * 2 - 9, feet - 115 + idleBob, 2, 2);
+        // 胡须
+        battleContext.strokeStyle = "#18251e"; battleContext.lineWidth = 3;
+        battleContext.beginPath(); battleContext.moveTo(x + fx * 2, feet - 98); battleContext.quadraticCurveTo(x + fx * 2 - 3, feet - 90, x + fx * 2 - 6, feet - 84); battleContext.stroke();
+
+        // —— 大刀（长柄大刀，扛于肩；攻击时带挥砍动画）——
+        battleContext.save();
+        battleContext.translate(x - 14 * fx, feet - 60);
+        let bossSwing = 0;
+        if (b.attacking > 0) bossSwing = Math.sin((0.3 - b.attacking) / 0.3 * Math.PI);
+        battleContext.rotate(fx * (0.5 + idleBob * .006 - bossSwing * 1.1));
+        battleContext.strokeStyle = "#5c3a21"; battleContext.lineWidth = 5;
+        battleContext.beginPath(); battleContext.moveTo(0, 0); battleContext.lineTo(-8 * fx, -34); battleContext.stroke();
+        // 刀头（宽背大刀）
+        battleContext.fillStyle = "#c9c9c0";
+        battleContext.strokeStyle = "#18251e"; battleContext.lineWidth = 2;
+        battleContext.beginPath();
+        battleContext.moveTo(-8 * fx, -34);
+        battleContext.lineTo(-20 * fx, -26);
+        battleContext.quadraticCurveTo(-26 * fx, -20, -22 * fx, -14);
+        battleContext.lineTo(-10 * fx, -20);
+        battleContext.closePath(); battleContext.fill(); battleContext.stroke();
+        battleContext.restore();
+
+        // —— 战靴 ——
+        battleContext.fillStyle = "#18251e";
+        battleContext.fillRect(x - 30, feet - 14, 26, 14); battleContext.fillRect(x + 4, feet - 14, 26, 14);
+
+        // 血条（大，带边框）
+        const pct = Math.max(0, b.hp / b.maxHp);
+        battleContext.fillStyle = "rgba(24,37,30,.75)"; battleContext.fillRect(x - 42, feet - 150, 84, 10);
+        battleContext.fillStyle = "#ff7862"; battleContext.fillRect(x - 42, feet - 150, 84 * pct, 10);
+        battleContext.strokeStyle = "#f0eddf"; battleContext.lineWidth = 1; battleContext.strokeRect(x - 42, feet - 150, 84, 10);
+        battleContext.restore();
+      }
+
+      // 战斗操作绑定
+      function battleMove(dir) { if (battle && battle.stage !== "victory" && battle.stage !== "defeat") battle.player.moveDir = dir; }
+      document.getElementById("battle-quit").addEventListener("click", () => { cancelAnimationFrame(battleAnimation); battle = null; showView("home-view"); });
+      document.getElementById("battle-retry").addEventListener("click", () => { const id = battle?.scenarioId; battle = null; if (id) startScenario(id); });
+      document.getElementById("battle-home").addEventListener("click", () => { cancelAnimationFrame(battleAnimation); battle = null; showView("home-view"); });
+      document.getElementById("touch-left").addEventListener("pointerdown", e => { e.preventDefault(); battleMove(-1); });
+      document.getElementById("touch-left").addEventListener("pointerup", () => battleMove(0));
+      document.getElementById("touch-left").addEventListener("pointercancel", () => battleMove(0));
+      document.getElementById("touch-right").addEventListener("pointerdown", e => { e.preventDefault(); battleMove(1); });
+      document.getElementById("touch-right").addEventListener("pointerup", () => battleMove(0));
+      document.getElementById("touch-right").addEventListener("pointercancel", () => battleMove(0));
+      document.getElementById("touch-attack").addEventListener("pointerdown", e => { e.preventDefault(); battleAttack(); });
+      document.getElementById("touch-jump-battle").addEventListener("pointerdown", e => { e.preventDefault(); battleJump(); });
+      // 键盘：移动 + 挥刀 + 跳跃
+      window.addEventListener("keydown", event => {
+        if (!battle || battle.stage === "victory" || battle.stage === "defeat") return;
+        if (event.code === "ArrowLeft" || event.code === "KeyA") { battle.player.moveDir = -1; battle.player.facing = -1; }
+        if (event.code === "ArrowRight" || event.code === "KeyD") { battle.player.moveDir = 1; battle.player.facing = 1; }
+        if (event.code === "KeyJ" || event.code === "Space") { event.preventDefault(); battleAttack(); }
+        if (event.code === "KeyW" || event.code === "ArrowUp" || event.code === "KeyK") { event.preventDefault(); battleJump(); }
+      });
+      window.addEventListener("keyup", event => {
+        if (!battle) return;
+        if (event.code === "ArrowLeft" || event.code === "KeyA" || event.code === "ArrowRight" || event.code === "KeyD") battle.player.moveDir = 0;
+      });
+
+      document.getElementById("battle-canvas").addEventListener("pointerdown", () => { if (battle && battle.stage !== "victory" && battle.stage !== "defeat") battleAttack(); });
     })();
   </script>
 </body>
